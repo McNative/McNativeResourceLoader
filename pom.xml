@@ -23,9 +23,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mcnative</groupId>
-    <artifactId>McNative</artifactId>
-    <packaging>pom</packaging>
+    <groupId>org.mcnative.loader</groupId>
+    <artifactId>McNativeResourceLoader</artifactId>
     <version>1.7.75.489-SNAPSHOT</version>
 
     <distributionManagement>
@@ -44,33 +43,16 @@
         <!-- Project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <dependency.mcnative.api>1.0.11.18-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.7.79.6-SNAPSHOT</dependency.mcnative.common>
+
         <!-- Dependency version -->
-        <dependency.bungeecord.version>1.16-R0.4-SNAPSHOT</dependency.bungeecord.version>
-        <dependency.bukkit.version>1.14.2-R0.1-SNAPSHOT</dependency.bukkit.version>
-        <dependency.placeholderapi.version>2.10.9</dependency.placeholderapi.version>
-        <dependency.cloudnet.v2.version>2.1.17</dependency.cloudnet.v2.version>
+        <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
+        <dependency.bukkit>1.14.2-R0.1-SNAPSHOT</dependency.bukkit>
 
-        <dependency.pretronic.libraries.utility>${dependency.pretronic.libraries}</dependency.pretronic.libraries.utility>
-        <dependency.pretronic.libraries.document>${dependency.pretronic.libraries}</dependency.pretronic.libraries.document>
-        <dependency.pretronic.libraries.concurrent>${dependency.pretronic.libraries}</dependency.pretronic.libraries.concurrent>
-        <dependency.pretronic.libraries.command>${dependency.pretronic.libraries}</dependency.pretronic.libraries.command>
-        <dependency.pretronic.libraries.event>${dependency.pretronic.libraries}</dependency.pretronic.libraries.event>
-        <dependency.pretronic.libraries.plugin>${dependency.pretronic.libraries}</dependency.pretronic.libraries.plugin>
-        <dependency.pretronic.libraries.dependency>${dependency.pretronic.libraries}</dependency.pretronic.libraries.dependency>
-        <dependency.pretronic.libraries.caching>${dependency.pretronic.libraries}</dependency.pretronic.libraries.caching>
-        <dependency.pretronic.libraries.resourceloader>${dependency.pretronic.libraries}</dependency.pretronic.libraries.resourceloader>
-        <dependency.pretronic.libraries.synchronisation>${dependency.pretronic.libraries}</dependency.pretronic.libraries.synchronisation>
-        <dependency.pretronic.libraries.logging>${dependency.pretronic.libraries}</dependency.pretronic.libraries.logging>
-        <dependency.pretronic.libraries.message>${dependency.pretronic.libraries}</dependency.pretronic.libraries.message>
         <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
-
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
 
-        <dependency.hikaricp>3.4.1</dependency.hikaricp>
-        <dependency.slf4j>1.7.25</dependency.slf4j>
-
-        <!-- Test dependencies -->
-        <test.junit.jupiter>5.5.2</test.junit.jupiter>
 
         <!-- Maven plugins -->
         <plugin.compiler.version>3.8.1</plugin.compiler.version>
@@ -79,24 +61,125 @@
         <plugin.jar.version>3.2.0</plugin.jar.version>
     </properties>
 
-    <modules>
-        <module>mcnative-common</module>
-        <module>mcnative-network-integrations</module>
-        <module>mcnative-proxy</module>
-        <module>mcnative-service</module>
-        <module>mcnative-bukkit</module>
-        <module>mcnative-bungeecord</module>
-        <module>mcnative-buildtool-maven</module>
-        <module>mcnative-loader</module>
-        <module>mcnative-build</module>
-        <module>mcnative-licensing</module>
-    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${plugin.shade.version}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
 
     <repositories>
         <repository>
             <id>pretronic</id>
             <url>https://repository.pretronic.net/repository/pretronic/</url>
         </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
+
+    <dependencies>
+        <!-- Internal project dependencies -->
+
+        <dependency>
+            <groupId>org.mcnative.runtime.api</groupId>
+            <artifactId>mcnative-runtime-api</artifactId>
+            <version>${dependency.mcnative.api}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.pretronic.libraries</groupId>
+            <artifactId>pretroniclibraries-plugin</artifactId>
+            <version>${dependency.pretronic.libraries}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.pretronic.libraries</groupId>
+            <artifactId>pretroniclibraries-resourceloader</artifactId>
+            <version>${dependency.pretronic.libraries}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.pretronic.libraries</groupId>
+            <artifactId>pretroniclibraries-document</artifactId>
+            <version>${dependency.pretronic.libraries}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- External dependencies -->
+
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${dependency.bukkit}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.26.Final</version>
+            <scope>compile</scope>
+        </dependency>
+
+        -->
+
+    </dependencies>
 
 </project>
