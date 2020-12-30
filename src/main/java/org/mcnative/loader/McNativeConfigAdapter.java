@@ -40,9 +40,9 @@ public class McNativeConfigAdapter {
         if(!FILE.exists()) return;
         try {
             DummyConfig config = YAML.loadAs(new FileInputStream(FILE),DummyConfig.class);
-            if(config.server == null) return;
-            ID = config.server.id;
-            SECRET = config.server.secret;
+            if(config.console == null) return;
+            ID = config.console.networkId;
+            SECRET = config.console.secret;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -58,28 +58,28 @@ public class McNativeConfigAdapter {
 
     public static class DummyConfig {
 
-        public DummyServer server;
+        public DummyCredentials console;
 
-        public DummyServer getServer() {
-            return server;
+        public DummyCredentials getConsole() {
+            return console;
         }
 
-        public void setServer(DummyServer server) {
-            this.server = server;
+        public void setConsole(DummyCredentials console) {
+            this.console = console;
         }
     }
 
-    public static class DummyServer {
+    public static class DummyCredentials {
 
-        public String id;
+        public String networkId;
         public String secret;
 
-        public String getId() {
-            return id;
+        public String getNetworkId() {
+            return networkId;
         }
 
-        public void setId(String id) {
-            this.id = id;
+        public void setNetworkId(String networkId) {
+            this.networkId = networkId;
         }
 
         public String getSecret() {

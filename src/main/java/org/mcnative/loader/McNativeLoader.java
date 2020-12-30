@@ -48,7 +48,7 @@ public class McNativeLoader extends ResourceLoader {
     private final RolloutProfile profile;
 
     static {
-        PLATFORM_IDS.put("bukkit","e5b65750-4dcc-4631-b275-06113b31a416");
+        PLATFORM_IDS.put("bukkit","d8b38fc3-189a-488e-aabc-87570e15646c");
         PLATFORM_IDS.put("bungeecord","22ce19f7-9ae8-45ef-9c09-659fc4c9a841");
     }
 
