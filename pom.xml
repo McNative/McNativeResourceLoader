@@ -53,7 +53,6 @@
         <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
 
-
         <!-- Maven plugins -->
         <plugin.compiler.version>3.8.1</plugin.compiler.version>
         <plugin.source.version>3.2.1</plugin.source.version>
