@@ -97,12 +97,12 @@ public class GuestPluginExecutor {
             description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
                     ,DocumentFileType.JSON.getReader().read(descriptionStream));
         }
-        if (descriptionStream != null && resourceLoader.getCurrentVersion() == null) {
+        if (descriptionStream == null && resourceLoader.getCurrentVersion() == null) {
             throw new ResourceException("No installed version found");
         }
         File location = resourceLoader != null ? resourceLoader.getLocalFile(resourceLoader.getCurrentVersion()) : this.location;
         if(description != null || isMcNativePlugin(location)){
-            if(resourceLoader != null){
+            if(descriptionStream == null){
                 ClassLoader classLoader = getClass().getClassLoader();
                 resourceLoader.loadReflected((URLClassLoader) classLoader);
             }
