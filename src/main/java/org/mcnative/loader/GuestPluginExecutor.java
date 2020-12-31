@@ -97,14 +97,14 @@ public class GuestPluginExecutor {
             description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
                     ,DocumentFileType.JSON.getReader().read(descriptionStream));
         }
-        if (resourceLoader.getCurrentVersion() == null) {
+        if (resourceLoader != null && resourceLoader.getCurrentVersion() == null) {
             throw new ResourceException("No installed version found");
         }
-        File location = resourceLoader.getLocalFile(resourceLoader.getCurrentVersion());
+        File location = resourceLoader != null ? resourceLoader.getLocalFile(resourceLoader.getCurrentVersion()) : this.location;
         if(description != null || isMcNativePlugin(location)){
             ClassLoader classLoader = getClass().getClassLoader();
             resourceLoader.loadReflected((URLClassLoader) classLoader);
-            this.loader = new McNativeGuestPluginLoader(executor,this.environment,this.logger,this.location,description);
+            this.loader = new McNativeGuestPluginLoader(executor,this.environment,this.logger,location,description);
             return true;
         }else if(environment.getName().equals(EnvironmentNames.BUKKIT)){
             this.loader = new BukkitGuestPluginLoader(location,this.location);

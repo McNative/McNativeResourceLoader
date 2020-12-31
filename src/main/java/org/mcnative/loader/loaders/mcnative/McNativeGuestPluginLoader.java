@@ -68,7 +68,6 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
         }
     }
 
-
     private void installDependencies(){
         InputStream stream = loader.getClassLoader().getResourceAsStream("dependencies.json");
         if(stream == null) return;
