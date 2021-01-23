@@ -92,5 +92,4 @@ public class McNativeConfig {
             this.secret = secret;
         }
     }
-
 }
