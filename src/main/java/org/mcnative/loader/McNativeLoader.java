@@ -25,8 +25,6 @@ import net.pretronic.libraries.resourceloader.VersionInfo;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
 import org.mcnative.loader.config.ResourceConfig;
-import org.mcnative.loader.rollout.RolloutConfiguration;
-import org.mcnative.loader.rollout.RolloutProfile;
 
 import java.io.File;
 import java.lang.reflect.Method;

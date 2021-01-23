@@ -57,10 +57,10 @@ public class LoaderConfiguration {
     }
 
     public String getEndpoint(String path){
-        String endpoint = getEndpoint().replace("http://","https://");
+        String endpoint = getEndpoint().trim().replace("http://","https://");
         if(!endpoint.startsWith("https://")) endpoint = "https://"+endpoint;
         if(!endpoint.endsWith("/")) endpoint+="/";
-        return "https://"+endpoint+""+path;
+        return endpoint+path;
     }
 
     public String getTemplate() {
@@ -162,9 +162,11 @@ public class LoaderConfiguration {
                         writer.close();
                     }else{
                         InputStream response = connection.getErrorStream();
-                        String content;
-                        try (Scanner scanner = new Scanner(response)) {
-                            content = scanner.useDelimiter("\\A").next();
+                        String content = "";
+                        if(response != null){
+                            try (Scanner scanner = new Scanner(response)) {
+                                content = scanner.useDelimiter("\\A").next();
+                            }
                         }
                         logger.log(Level.SEVERE,"(Resource-Loader) Could not load rollout configuration from remote host ("+connection.getResponseCode()+") "+content);
                         return available;

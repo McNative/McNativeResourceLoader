@@ -29,7 +29,6 @@ import org.mcnative.loader.config.ResourceConfig;
 import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
-import org.mcnative.loader.rollout.RolloutProfile;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;

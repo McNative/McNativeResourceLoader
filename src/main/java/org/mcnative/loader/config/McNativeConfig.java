@@ -1,6 +1,5 @@
 package org.mcnative.loader.config;
 
-import org.mcnative.loader.rollout.RolloutConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
@@ -23,16 +22,12 @@ public class McNativeConfig {
         dumper.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumper.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
         dumper.setPrettyFlow(true);
-        CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(RolloutConfiguration.class,RolloutConfiguration.class.getClassLoader());
-
-        TypeDescription configDesc = new TypeDescription(RolloutConfiguration.class);
-        constructor.addTypeDescription(configDesc);
 
         Representer representer = new Representer();
         representer.getPropertyUtils().setAllowReadOnlyProperties(true);
         representer.getPropertyUtils().setSkipMissingProperties(true);
 
-        YAML = new Yaml(constructor,representer,dumper);
+        YAML = new Yaml(representer,dumper);
     }
 
     public static void load(File location){
