@@ -23,6 +23,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
+import org.mcnative.loader.config.McNativeConfig;
 import org.mcnative.loader.rollout.RolloutConfiguration;
 import org.mcnative.loader.rollout.RolloutProfile;
 
@@ -34,6 +35,7 @@ import java.util.logging.Level;
 public class BungeeCordMcNativePluginBootstrap extends Plugin implements PlatformExecutor {
 
     private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
     private GuestPluginExecutor executor;
@@ -42,6 +44,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
     public void onLoad() {
         try{
             CertificateValidation.disable();
+            McNativeConfig.load(CONFIG_YML);
 
             InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
             Properties loaderProperties = new Properties();

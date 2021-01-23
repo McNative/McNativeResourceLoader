@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
+import org.mcnative.loader.config.McNativeConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
 public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listener, PlatformExecutor {
 
     private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
     public static BukkitMcNativePluginBootstrap INSTANCE;
@@ -55,6 +57,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
         INSTANCE = this;
         try{
             CertificateValidation.disable();
+            McNativeConfig.load(CONFIG_YML);
 
             InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
             Properties loaderProperties = new Properties();
@@ -84,13 +87,13 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             }
 
             CertificateValidation.reset();
+            configuration.save(LOADER_YML);
 
             this.executor.loadGuestPlugin();
 
             String version = this.executor.getLoader().getLoadedVersion();
             ReflectionUtil.changeFieldValue(getDescription(),"version",version);
 
-            configuration.save(LOADER_YML);
         }catch (Exception exception){
             this.executor = null;
             exception.printStackTrace();

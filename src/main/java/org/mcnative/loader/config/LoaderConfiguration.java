@@ -141,7 +141,7 @@ public class LoaderConfiguration {
                 }
 
                 try {
-                    logger.log(Level.INFO,"(McNative-Loader) Pulling rollout configuration from "+endpoint);
+                    logger.log(Level.INFO,"(Resource-Loader) Pulling rollout configuration from "+endpoint);
                     HttpURLConnection connection = (HttpURLConnection)new URL(getEndpoint("v1/profiles/"+profile+"?plain=true")).openConnection();
                     connection.setDoOutput(true);
                     connection.setRequestProperty("Accept-Charset", "UTF-8");
@@ -166,15 +166,15 @@ public class LoaderConfiguration {
                         try (Scanner scanner = new Scanner(response)) {
                             content = scanner.useDelimiter("\\A").next();
                         }
-                        logger.log(Level.SEVERE,"Could not load rollout configuration from remote host ("+connection.getResponseCode()+") "+content);
+                        logger.log(Level.SEVERE,"(Resource-Loader) Could not load rollout configuration from remote host ("+connection.getResponseCode()+") "+content);
                         return available;
                     }
                 } catch (IOException e) {
-                    logger.log(Level.SEVERE,"Could not load rollout configuration from remote host ("+e.getMessage()+") ");
+                    logger.log(Level.SEVERE,"(Resource-Loader) Could not load rollout configuration from remote host ("+e.getMessage()+") ");
                     return available;
                 }
             }else{
-                logger.log(Level.SEVERE,"A remote rollout profile requires McNative console credentials.");
+                logger.log(Level.SEVERE,"(Resource-Loader) A remote rollout profile requires McNative console credentials.");
                 return false;
             }
         }
