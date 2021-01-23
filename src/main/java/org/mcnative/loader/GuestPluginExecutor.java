@@ -141,7 +141,8 @@ public class GuestPluginExecutor {
         try{
             latest = resourceLoader.getLatestVersion();
         }catch (Exception exception){
-            logger.log(Level.SEVERE,"(Resource-Loader) Could not get latest "+config.getQualifier()+" version ("+exception.getMessage()+")");
+            logger.log(Level.SEVERE,"(McNative-Loader) Could not get latest version");
+            logger.log(Level.SEVERE,"(McNative-Loader) Error: "+exception.getMessage());
             if(current == null || current.equals(VersionInfo.UNKNOWN)){
                 logger.log(Level.SEVERE,"(Resource-Loader) "+name+" is not available, shutting down");
                 return false;
