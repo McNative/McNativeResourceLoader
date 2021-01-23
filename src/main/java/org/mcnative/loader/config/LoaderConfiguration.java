@@ -88,7 +88,7 @@ public class LoaderConfiguration {
         for (ResourceConfig config : resourceConfigs) {
             if(config.getName().equalsIgnoreCase(name)) return config;
         }
-        ResourceConfig config = new ResourceConfig(name.toLowerCase(),null,"QUALIFIER","LATEST");
+        ResourceConfig config = new ResourceConfig(name.toLowerCase(),null,"RELEASE","LATEST");
         this.resourceConfigs.add(config);
         return config;
     }

@@ -103,7 +103,6 @@ public class McNativeLoader extends ResourceLoader {
         logger.log(Level.INFO,"(McNative-Loader) Server: "+configuration.getEndpoint()+", Qualifier: "+config.getQualifier());
 
         try{
-            System.out.println(MCNATIVE.getVersionUrl());
             latest = getLatestVersion();
         }catch (Exception exception){
             logger.log(Level.SEVERE,"(McNative-Loader) Could not get latest version ");
