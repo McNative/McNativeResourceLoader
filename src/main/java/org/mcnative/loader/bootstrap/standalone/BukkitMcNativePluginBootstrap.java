@@ -69,7 +69,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
-                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, configuration)){
+                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, configuration)){
                     getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
