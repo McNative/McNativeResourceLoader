@@ -94,4 +94,6 @@ public class McNativePluginLoader extends DefaultPluginLoader {
         try { stream.close(); } catch (IOException ignored) {}
         return result;
     }
+
 }
+
