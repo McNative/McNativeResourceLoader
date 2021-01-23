@@ -29,8 +29,8 @@ import net.pretronic.libraries.plugin.description.PluginDescription;
 import net.pretronic.libraries.plugin.loader.DefaultPluginLoader;
 import net.pretronic.libraries.plugin.loader.classloader.PluginClassLoader;
 import net.pretronic.libraries.plugin.manager.PluginManager;
-import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.loader.PlatformExecutor;
+import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class McNativePluginLoader extends DefaultPluginLoader {
     }
 
     private RuntimeEnvironment<?> getEnvironment(){
-        return ReflectionUtil.getFieldValue(DefaultPluginLoader.class,this,"environment",RuntimeEnvironment.class);
+        return LoaderUtil.getFieldValue(DefaultPluginLoader.class,this,"environment",RuntimeEnvironment.class);
     }
 
     @Override

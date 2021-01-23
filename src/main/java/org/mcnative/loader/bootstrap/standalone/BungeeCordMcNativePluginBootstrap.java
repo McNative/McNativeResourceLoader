@@ -20,10 +20,10 @@
 package org.mcnative.loader.bootstrap.standalone;
 
 import net.md_5.bungee.api.plugin.Plugin;
-import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -78,7 +78,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             this.executor.loadGuestPlugin();
 
             String version = this.executor.getLoader().getLoadedVersion();
-            ReflectionUtil.changeFieldValue(getDescription(),"version",version);
+            LoaderUtil.changeFieldValue(getDescription(),"version",version);
 
             configuration.save(LOADER_YML);
         }catch (Exception exception){

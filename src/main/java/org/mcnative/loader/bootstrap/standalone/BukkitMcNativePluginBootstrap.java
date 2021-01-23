@@ -19,8 +19,6 @@
 
 package org.mcnative.loader.bootstrap.standalone;
 
-import net.pretronic.libraries.utility.Iterators;
-import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +30,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +92,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             this.executor.loadGuestPlugin();
 
             String version = this.executor.getLoader().getLoadedVersion();
-            ReflectionUtil.changeFieldValue(getDescription(),"version",version);
+            LoaderUtil.changeFieldValue(getDescription(),"version",version);
 
         }catch (Exception exception){
             this.executor = null;
@@ -155,8 +154,8 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
     @SuppressWarnings("unchecked")
     @Override
     public void unload() {
-        List<Plugin> plugins = (List<org.bukkit.plugin.Plugin>) ReflectionUtil.getFieldValue(Bukkit.getPluginManager(),"plugins");
-        Map<String, Plugin> names = (Map<String, org.bukkit.plugin.Plugin>) ReflectionUtil.getFieldValue(Bukkit.getPluginManager(),"lookupNames");
+        List<Plugin> plugins = (List<org.bukkit.plugin.Plugin>) LoaderUtil.getFieldValue(Bukkit.getPluginManager(),"plugins");
+        Map<String, Plugin> names = (Map<String, org.bukkit.plugin.Plugin>) LoaderUtil.getFieldValue(Bukkit.getPluginManager(),"lookupNames");
 
         ClassLoader classLoader = getClass().getClassLoader();
 
@@ -164,8 +163,8 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
         plugins.remove(this);
 
         if (classLoader instanceof URLClassLoader) {
-            ReflectionUtil.changeFieldValue(classLoader,"plugin",null);
-            ReflectionUtil.changeFieldValue(classLoader,"pluginInit",null);
+            LoaderUtil.changeFieldValue(classLoader,"plugin",null);
+            LoaderUtil.changeFieldValue(classLoader,"pluginInit",null);
 
             try {
                 if(Class.forName("org.mcnative.runtime.api.McNative").getClassLoader() == classLoader){
@@ -174,7 +173,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 }
             } catch (ClassNotFoundException ignored) {}
 
-            Map<String, Class<?>> classes = (Map<String, Class<?>>) ReflectionUtil.getFieldValue(classLoader,"classes");
+            Map<String, Class<?>> classes = (Map<String, Class<?>>) LoaderUtil.getFieldValue(classLoader,"classes");
             classes.clear();
             clearCachedClasses(classLoader);
 
@@ -188,11 +187,11 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
 
     @SuppressWarnings("unchecked")
     private void clearCachedClasses(ClassLoader classLoader){
-        Map<Pattern, PluginLoader> loaders = (Map<Pattern, PluginLoader>) ReflectionUtil.getFieldValue(Bukkit.getPluginManager(),"fileAssociations");
+        Map<Pattern, PluginLoader> loaders = (Map<Pattern, PluginLoader>) LoaderUtil.getFieldValue(Bukkit.getPluginManager(),"fileAssociations");
         for (Map.Entry<Pattern, PluginLoader> loader : loaders.entrySet()) {
             if(loader.getValue() instanceof JavaPluginLoader){
-                Map<String, Class<?>> classes = (Map<String, Class<?>>) ReflectionUtil.getFieldValue(loader.getValue(),"classes");
-                Iterators.removeSilent(classes.entrySet(), entry -> entry.getValue().getClassLoader().equals(classLoader));
+                Map<String, Class<?>> classes = (Map<String, Class<?>>) LoaderUtil.getFieldValue(loader.getValue(),"classes");
+                LoaderUtil.removeSilent(classes.entrySet(), entry -> entry.getValue().getClassLoader().equals(classLoader));
             }
         }
     }

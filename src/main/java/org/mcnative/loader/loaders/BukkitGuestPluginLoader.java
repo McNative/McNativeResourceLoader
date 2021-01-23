@@ -1,7 +1,5 @@
 package org.mcnative.loader.loaders;
 
-import net.pretronic.libraries.utility.exception.OperationFailedException;
-import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
@@ -9,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcnative.loader.bootstrap.standalone.BukkitMcNativePluginBootstrap;
+import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
 import java.util.List;
@@ -43,9 +42,9 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
             if(plugin == null) return;
             File folder = new File("plugins/"+plugin.getName());
             if(!folder.exists()) folder.mkdirs();
-            ReflectionUtil.changeFieldValue(JavaPlugin.class,plugin,"dataFolder",folder);
+            LoaderUtil.changeFieldValue(JavaPlugin.class,plugin,"dataFolder",folder);
         } catch (InvalidPluginException | InvalidDescriptionException e) {
-            throw new OperationFailedException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -53,9 +52,9 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
     @Override
     public void handlePluginEnable() {
         if(Bukkit.getPluginManager() instanceof SimplePluginManager){
-            ReflectionUtil.changeFieldValue(JavaPlugin.class,BukkitMcNativePluginBootstrap.INSTANCE,"isEnabled",false);
-            List<Plugin> plugins = (List<Plugin>) ReflectionUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"plugins");
-            Map<String, Plugin> lookupNames = (Map<String, Plugin>) ReflectionUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"lookupNames");
+            LoaderUtil.changeFieldValue(JavaPlugin.class,BukkitMcNativePluginBootstrap.INSTANCE,"isEnabled",false);
+            List<Plugin> plugins = (List<Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"plugins");
+            Map<String, Plugin> lookupNames = (Map<String, Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"lookupNames");
             plugins.remove(BukkitMcNativePluginBootstrap.INSTANCE);
             lookupNames.remove(BukkitMcNativePluginBootstrap.INSTANCE.getDescription().getName());
         }else{
