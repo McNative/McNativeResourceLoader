@@ -78,6 +78,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 }
             }
 
+
             this.executor = new GuestPluginExecutor(this,getFile(),getLogger(),EnvironmentNames.BUKKIT,loaderProperties,configuration);
 
             if(!this.executor.install()){
