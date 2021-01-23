@@ -66,5 +66,4 @@ public class CertificateValidation {
         HttpsURLConnection.setDefaultHostnameVerifier(VERIFIER);
         HttpsURLConnection.setDefaultSSLSocketFactory(SSL_FACTORY);
     }
-
 }
