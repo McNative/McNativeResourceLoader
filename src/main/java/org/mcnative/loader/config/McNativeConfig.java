@@ -22,12 +22,16 @@ public class McNativeConfig {
         dumper.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumper.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
         dumper.setPrettyFlow(true);
+        CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(McNativeConfig.class,McNativeConfig.class.getClassLoader());
+
+        TypeDescription configDesc = new TypeDescription(McNativeConfig.class);
+        constructor.addTypeDescription(configDesc);
 
         Representer representer = new Representer();
         representer.getPropertyUtils().setAllowReadOnlyProperties(true);
         representer.getPropertyUtils().setSkipMissingProperties(true);
 
-        YAML = new Yaml(representer,dumper);
+        YAML = new Yaml(constructor,representer,dumper);
     }
 
     public static void load(File location){
