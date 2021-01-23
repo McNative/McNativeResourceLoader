@@ -19,27 +19,26 @@
 
 package org.mcnative.loader;
 
-import net.pretronic.libraries.document.Document;
-import net.pretronic.libraries.document.type.DocumentFileType;
-import net.pretronic.libraries.plugin.RuntimeEnvironment;
-import net.pretronic.libraries.plugin.description.DefaultPluginDescription;
-import net.pretronic.libraries.plugin.description.PluginDescription;
 import net.pretronic.libraries.resourceloader.ResourceException;
 import net.pretronic.libraries.resourceloader.ResourceInfo;
 import net.pretronic.libraries.resourceloader.ResourceLoader;
 import net.pretronic.libraries.resourceloader.VersionInfo;
-import net.pretronic.libraries.utility.io.IORuntimeException;
+import org.mcnative.loader.config.LoaderConfiguration;
+import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.ResourceConfig;
 import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
 import org.mcnative.loader.rollout.RolloutProfile;
-import org.mcnative.runtime.api.McNative;
+import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -53,17 +52,19 @@ public class GuestPluginExecutor {
     private final PlatformExecutor executor;
     private final File location;
     private final Logger logger;
-    private final RuntimeEnvironment<McNative> environment;
-    private final RolloutProfile profile;
+    private final String runtimeName;
+    private final Properties loaderProperties;
+    private final LoaderConfiguration configuration;
     private GuestPluginLoader loader;
     private ResourceLoader resourceLoader;
 
-    public GuestPluginExecutor(PlatformExecutor executor,File location, Logger logger, String runtimeName,RolloutProfile profile) {
+    public GuestPluginExecutor(PlatformExecutor executor, File location, Logger logger, String runtimeName,Properties loaderProperties, LoaderConfiguration configuration) {
         this.executor = executor;
         this.location = location;
         this.logger = logger;
-        this.environment = new RuntimeEnvironment<>(runtimeName, McNative.getInstance());
-        this.profile = profile;
+        this.runtimeName = runtimeName;
+        this.loaderProperties = loaderProperties;
+        this.configuration = configuration;
     }
 
     public boolean install(){
@@ -71,47 +72,35 @@ public class GuestPluginExecutor {
         if(stream != null){
             setupLoader(stream);
         }else{
-            InputStream streamLoader = getClass().getClassLoader().getResourceAsStream("mcnative-loader.json");
-            if(streamLoader == null){
-                logger.log(Level.SEVERE,"Invalid or corrupt mcnative plugin (mcnative.json or mcnative-loader.json is not available)");
+            try{
+                if(downloadResource(loaderProperties)){
+                    setupLoader(null);
+                }else return false;
+            }catch (Exception exception){
+                logger.log(Level.SEVERE,String.format("Could not install plugin %s",exception.getMessage()));
+                exception.printStackTrace();
                 return false;
-            }else{
-                try{
-                    Document loaderInfo = DocumentFileType.JSON.getReader().read(streamLoader);
-                    if(downloadResource(loaderInfo)){
-                        setupLoader(null);
-                    }else return false;
-                }catch (Exception exception){
-                    logger.log(Level.SEVERE,String.format("Could not install plugin %s",exception.getMessage()));
-                    exception.printStackTrace();
-                    return false;
-                }
             }
         }
         return true;
     }
 
     private boolean setupLoader(InputStream descriptionStream){
-        PluginDescription description = null;
-        if(descriptionStream != null){
-            description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
-                    ,DocumentFileType.JSON.getReader().read(descriptionStream));
-        }
         if (descriptionStream == null && resourceLoader.getCurrentVersion() == null) {
             throw new ResourceException("No installed version found");
         }
         File location = resourceLoader != null ? resourceLoader.getLocalFile(resourceLoader.getCurrentVersion()) : this.location;
-        if(description != null || isMcNativePlugin(location)){
+        if(descriptionStream != null || isMcNativePlugin(location)){
             if(descriptionStream == null){
                 ClassLoader classLoader = getClass().getClassLoader();
                 resourceLoader.loadReflected((URLClassLoader) classLoader);
             }
-            this.loader = new McNativeGuestPluginLoader(executor,this.environment,this.logger,location,description);
+            this.loader = new McNativeGuestPluginLoader(executor,this.runtimeName,this.logger,location,descriptionStream);
             return true;
-        }else if(environment.getName().equals(EnvironmentNames.BUKKIT)){
+        }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUKKIT)){
             this.loader = new BukkitGuestPluginLoader(location,this.location);
             return true;
-        }else if(environment.getName().equals(EnvironmentNames.BUNGEECORD)){
+        }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUNGEECORD)){
             return true;
         }else{
             logger.log(Level.SEVERE,"(Resource-Loader) No valid plugin manifest found");
@@ -119,73 +108,99 @@ public class GuestPluginExecutor {
         }
     }
 
-    private boolean downloadResource(Document loader){
-        String name = loader.getString("plugin.name");
+    private boolean downloadResource(Properties loader){
+        String name = loader.getProperty("plugin.name");
+        String id = loader.getProperty("plugin.id");
+
+        ResourceConfig config = configuration.getResourceConfig(UUID.fromString(id));
+        if(config == null) config = configuration.getResourceConfig(name.toLowerCase());
 
         ResourceInfo info = new ResourceInfo(name,new File("plugins/McNative/lib/resources/"+name.toLowerCase()));
-        info.setVersionUrl(replaceLoaderVariables(loader,VERSION_URL));
+        info.setVersionUrl(replaceLoaderVariables(loader,config,VERSION_URL));
+        info.setDownloadUrl(replaceLoaderVariables(loader,config,DOWNLOAD_URL));
         resourceLoader = new ResourceLoader(info);
 
-        if(McNative.getInstance().getConsoleCredentials() != null){
+        if(McNativeConfig.isAvailable()){
             info.setAuthenticator(httpURLConnection -> {
-                httpURLConnection.setRequestProperty("serverName",McNative.getInstance().getName());
-                httpURLConnection.setRequestProperty("serverId",McNative.getInstance().getConsoleCredentials().getNetworkId());
-                httpURLConnection.setRequestProperty("serverSecret",McNative.getInstance().getConsoleCredentials().getSecret());
+                httpURLConnection.setRequestProperty("networkId",McNativeConfig.getNetworkId());
+                httpURLConnection.setRequestProperty("networkSecret",McNativeConfig.getNetworkSecret());
             });
+        }else{
+            String licenseKey = getLicenseKey(name);
+            if(licenseKey != null){
+                info.setAuthenticator(httpURLConnection -> {
+                    httpURLConnection.setRequestProperty("licenseKey",McNativeConfig.getNetworkId());
+                });
+            }
         }
 
         VersionInfo current = resourceLoader.getCurrentVersion();
         VersionInfo latest = VersionInfo.UNKNOWN;
 
-        logger.log(Level.SEVERE,"(Resource-Loader) Server: "+profile.getServer()+", Qualifier: "+profile.getQualifier());
+        logger.log(Level.SEVERE,"(Resource-Loader) Server: "+configuration.getEndpoint()+", Qualifier: "+config.getQualifier());
         try{
             latest = resourceLoader.getLatestVersion();
         }catch (Exception exception){
-            logger.log(Level.SEVERE,"(Resource-Loader) Could not get latest "+profile.getQualifier()+" version ("+exception.getMessage()+")");
+            logger.log(Level.SEVERE,"(Resource-Loader) Could not get latest "+config.getQualifier()+" version ("+exception.getMessage()+")");
             if(current == null || current.equals(VersionInfo.UNKNOWN)){
-                logger.log(Level.SEVERE,"(Resource-Loader) Resource is not available, shutting down");
+                logger.log(Level.SEVERE,"(Resource-Loader) "+name+" is not available, shutting down");
                 return false;
             }
         }
 
-        if(profile.isAutomatically() || current == null){
+        if(config.isAutomatically()){
             if(latest != null){
-                if(resourceLoader.isLatestVersion()){
-                    logger.info("(Resource-Loader) "+name+" "+latest.getName()+" (Up to date)");
+                if(current != null && resourceLoader.isLatestVersion()){
+                    logger.info("(Resource-Loader) McNative "+latest.getName()+" (Up to date)");
                 }else{
-                    info.setDownloadUrl(replaceLoaderVariables(loader,DOWNLOAD_URL));
-
-                    logger.info("(Resource-Loader) Downloading "+name+" "+latest.getName());
-                    try{
-                        resourceLoader.download(latest);
-                        logger.info("(McNative-Loader) Successfully downloaded "+name);
-                    }catch (Exception exception){
-                        exception.printStackTrace();
-                        if(current == null || current.equals(VersionInfo.UNKNOWN)){
-                            logger.info("(McNative-Loader) Download failed, shutting down");
-                            logger.info("(McNative-Loader) Error: "+exception.getMessage());
-                            return false;
-                        }else{
-                            logger.info("(McNative-Loader) download failed, trying to start an older version");
-                            logger.info("(McNative-Loader) Error: "+exception.getMessage());
-                        }
-                    }
+                    return download(resourceLoader, current, latest);
                 }
             }
         }else{
-            logger.info("(Resource-Loader) automatically updating is disabled");
-            logger.info("(Resource-Loader) Latest Version: "+latest.getName());
+            VersionInfo version = config.getVersionObject();
+            if(current == null || current.equals(VersionInfo.UNKNOWN) || !current.equals(version)){
+                if(!download(resourceLoader,current,version)) return false;
+            }
+            if(resourceLoader.isLatestVersion()) logger.info("(Resource-Loader) McNative "+version.getName()+" (Up to date)");
+            else if(latest != null){
+                logger.info("(Resource-Loader) automatically updating is disabled");
+                logger.info("(Resource-Loader) Latest Version: "+latest.getName());
+            }
         }
-
         return true;
     }
 
-    private String replaceLoaderVariables(Document loaderConfig,String input){
+    private String getLicenseKey(String name){
+        File location = new File("plugins/"+name+"/license.key");
+        return location.exists() ? LoaderUtil.readAllText(location) : null;
+    }
+
+    private boolean download(ResourceLoader loader,VersionInfo current,VersionInfo latest){
+        logger.info("(McNative-Loader) Downloading McNative "+latest.getName());
+        try{
+            loader.download(latest);
+            logger.info("(McNative-Loader) Successfully downloaded McNative");
+        }catch (Exception exception){
+            exception.printStackTrace();
+            if(current == null || current.equals(VersionInfo.UNKNOWN)){
+                exception.printStackTrace();
+                logger.info("(McNative-Loader) Download failed, shutting down");
+                logger.info("(McNative-Loader) Error: "+exception.getMessage());
+                return false;
+            }else{
+                logger.info("(McNative-Loader) download failed, trying to start an older version");
+                logger.info("(McNative-Loader) Error: "+exception.getMessage());
+            }
+        }
+        return true;
+    }
+
+    private String replaceLoaderVariables(Properties loaderConfig,ResourceConfig resourceConfig,String input){
         return input
-                .replace("{resource.name}",loaderConfig.getString("plugin.name"))
-                .replace("{resource.id}",loaderConfig.getString("plugin.id"))
-                .replace("{profile.server}",profile.getServer())
-                .replace("{profile.qualifier}",profile.getQualifier());
+                .replace("{resource.name}",loaderConfig.getProperty("plugin.name"))
+                .replace("{resource.id}",loaderConfig.getProperty("plugin.id"))
+                .replace("{profile.server}",configuration.getEndpoint())
+                .replace("{profile.qualifier}",resourceConfig.getQualifier());
     }
 
     public GuestPluginLoader getLoader() {
@@ -217,7 +232,7 @@ public class GuestPluginExecutor {
                 return false;
             }
         } catch (IOException exception) {
-            throw new IORuntimeException(exception);
+            throw new RuntimeException(exception);
         }
     }
 

@@ -1,4 +1,4 @@
-package org.mcnative.loader;
+package org.mcnative.loader.config;
 
 import org.mcnative.loader.rollout.RolloutConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
@@ -10,12 +10,11 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class McNativeConfigAdapter {
+public class McNativeConfig {
 
-    private static String ID = null;
-    private static String SECRET = null;
+    private static String NETWORK_ID = null;
+    private static String NETWORK_SECRET = null;
 
-    public static File FILE = new File("plugins/McNative/config.yml");
     public static Yaml YAML;
 
     static {
@@ -36,40 +35,44 @@ public class McNativeConfigAdapter {
         YAML = new Yaml(constructor,representer,dumper);
     }
 
-    public static void load(){
-        if(!FILE.exists()) return;
+    public static void load(File location){
+        if(!location.exists()) return;
         try {
-            DummyConfig config = YAML.loadAs(new FileInputStream(FILE),DummyConfig.class);
+            DummyConfig config = YAML.loadAs(new FileInputStream(location),DummyConfig.class);
             if(config.console == null) return;
-            ID = config.console.networkId;
-            SECRET = config.console.secret;
+            NETWORK_ID = config.console.networkId;
+            NETWORK_SECRET = config.console.secret;
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public static String getId(){
-        return ID;
+    public static String getNetworkId(){
+        return NETWORK_ID;
     }
 
-    public static String getSecret(){
-        return SECRET;
+    public static String getNetworkSecret(){
+        return NETWORK_SECRET;
+    }
+
+    public static boolean isAvailable(){
+        return NETWORK_ID != null && !NETWORK_ID.equalsIgnoreCase("00000-00000-00000");
     }
 
     public static class DummyConfig {
 
-        public DummyCredentials console;
+        public DummyConsoleSection console;
 
-        public DummyCredentials getConsole() {
+        public DummyConsoleSection getConsole() {
             return console;
         }
 
-        public void setConsole(DummyCredentials console) {
+        public void setConsole(DummyConsoleSection console) {
             this.console = console;
         }
     }
 
-    public static class DummyCredentials {
+    public static class DummyConsoleSection {
 
         public String networkId;
         public String secret;

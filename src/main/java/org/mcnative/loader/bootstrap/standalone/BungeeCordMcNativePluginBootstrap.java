@@ -17,32 +17,55 @@
  * under the License.
  */
 
-package org.mcnative.loader.bootstrap;
+package org.mcnative.loader.bootstrap.standalone;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.loader.*;
+import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.rollout.RolloutConfiguration;
 import org.mcnative.loader.rollout.RolloutProfile;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.logging.Level;
 
 public class BungeeCordMcNativePluginBootstrap extends Plugin implements PlatformExecutor {
+
+    private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
     private GuestPluginExecutor executor;
 
     @Override
     public void onLoad() {
         try{
-            RolloutConfiguration configuration = RolloutConfiguration.load();
-
-            RolloutProfile mcnative = configuration.getProfile(McNativeLoader.RESOURCE_NAME);
-            RolloutProfile resource = configuration.getProfile(getDescription().getName());
-
             CertificateValidation.disable();
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, mcnative)) return;
-            this.executor = new GuestPluginExecutor(this,getDescription().getFile(),getLogger(),EnvironmentNames.BUNGEECORD,resource);
+            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
+            Properties loaderProperties = new Properties();
+            loaderProperties.load(loaderConfig);
+            if(loaderConfig == null){
+                getLogger().log(Level.SEVERE,"Invalid or corrupt McNative plugin (mcnative-loader.json is not available)");
+                getProxy().getPluginManager().unregisterCommands(this);
+                getProxy().getPluginManager().unregisterListeners(this);
+                return;
+            }
+
+            LoaderConfiguration configuration = LoaderConfiguration.load(LOADER_YML);
+            configuration.pullProfiles(getLogger(),LOADER_CACHE);
+
+            if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
+                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, configuration)){
+                    getProxy().getPluginManager().unregisterCommands(this);
+                    getProxy().getPluginManager().unregisterListeners(this);
+                    return;
+                }
+            }
+
+            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, configuration)) return;
+            this.executor = new GuestPluginExecutor(this,getDescription().getFile(),getLogger(),EnvironmentNames.BUNGEECORD,loaderProperties,configuration);
 
             if(!this.executor.install()){
                 this.executor = null;
@@ -56,7 +79,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             String version = this.executor.getLoader().getLoadedVersion();
             ReflectionUtil.changeFieldValue(getDescription(),"version",version);
 
-            RolloutConfiguration.save(configuration);
+            configuration.save(LOADER_YML);
         }catch (Exception exception){
             this.executor = null;
             getLogger().log(Level.SEVERE,String.format("Could not bootstrap plugin (%s)",exception.getMessage()));

@@ -25,6 +25,7 @@
 
     <groupId>org.mcnative.loader</groupId>
     <artifactId>McNativeResourceLoader</artifactId>
+    <packaging>pom</packaging>
     <version>1.7.75.8</version>
 
     <distributionManagement>
@@ -52,7 +53,6 @@
 
         <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
-
 
         <!-- Maven plugins -->
         <plugin.compiler.version>3.8.1</plugin.compiler.version>

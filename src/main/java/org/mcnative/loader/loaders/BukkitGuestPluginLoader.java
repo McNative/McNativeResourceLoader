@@ -8,7 +8,7 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcnative.loader.bootstrap.BukkitMcNativePluginBootstrap;
+import org.mcnative.loader.bootstrap.standalone.BukkitMcNativePluginBootstrap;
 
 import java.io.File;
 import java.util.List;

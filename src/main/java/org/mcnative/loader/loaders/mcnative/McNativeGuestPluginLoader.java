@@ -6,6 +6,7 @@ import net.pretronic.libraries.document.type.DocumentFileType;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
 import net.pretronic.libraries.plugin.Plugin;
 import net.pretronic.libraries.plugin.RuntimeEnvironment;
+import net.pretronic.libraries.plugin.description.DefaultPluginDescription;
 import net.pretronic.libraries.plugin.description.PluginDescription;
 import net.pretronic.libraries.plugin.loader.classloader.BridgedPluginClassLoader;
 import org.mcnative.loader.PlatformExecutor;
@@ -23,9 +24,13 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     private final Logger logger;
     private final McNativePluginLoader loader;
 
-    public McNativeGuestPluginLoader(PlatformExecutor executor, RuntimeEnvironment<McNative> environment, Logger logger, File location, PluginDescription description) {
+    public McNativeGuestPluginLoader(PlatformExecutor executor, String runtimeName, Logger logger, File location, InputStream descriptionStream) {
+        PluginDescription description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
+                ,DocumentFileType.JSON.getReader().read(descriptionStream));
+
         this.logger = logger;
-        this.loader = new McNativePluginLoader(executor, McNative.getInstance().getPluginManager(),environment
+        this.loader = new McNativePluginLoader(executor, McNative.getInstance().getPluginManager()
+                ,new RuntimeEnvironment<>(runtimeName,McNative.getInstance())
                 ,new JdkPretronicLogger(logger),new BridgedPluginClassLoader(getClass().getClassLoader())
                 ,location,description,false);
         installDependencies();
