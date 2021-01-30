@@ -78,7 +78,7 @@ public class LoaderConfiguration {
     public ResourceConfig getResourceConfig(UUID id){
         Objects.requireNonNull(id);
         for (ResourceConfig config : resourceConfigs) {
-            if(config.getId().equals(id)) return config;
+            if(config.getId() != null && config.getId().equals(id)) return config;
         }
         return null;
     }
@@ -86,7 +86,7 @@ public class LoaderConfiguration {
     public ResourceConfig getResourceConfig(String name){
         Objects.requireNonNull(name);
         for (ResourceConfig config : resourceConfigs) {
-            if(config.getName().equalsIgnoreCase(name)) return config;
+            if(config.getName() != null && config.getName().equalsIgnoreCase(name)) return config;
         }
         ResourceConfig config = new ResourceConfig(name.toLowerCase(),null,"RELEASE","LATEST");
         this.resourceConfigs.add(config);

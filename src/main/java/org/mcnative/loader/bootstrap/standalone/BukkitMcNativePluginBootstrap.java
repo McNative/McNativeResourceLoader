@@ -77,7 +77,6 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 }
             }
 
-
             this.executor = new GuestPluginExecutor(this,getFile(),getLogger(),EnvironmentNames.BUKKIT,loaderProperties,configuration);
 
             if(!this.executor.install()){
@@ -86,7 +85,6 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 return;
             }
 
-            CertificateValidation.reset();
             configuration.save(LOADER_YML);
 
             this.executor.loadGuestPlugin();
@@ -100,6 +98,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             getLogger().log(Level.SEVERE,String.format("Could not load plugin (%s)",exception.getMessage()));
             getServer().getPluginManager().disablePlugin(this);
         }
+        CertificateValidation.reset();
     }
 
     @Override

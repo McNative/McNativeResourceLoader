@@ -57,6 +57,8 @@ public class GuestPluginExecutor {
     private GuestPluginLoader loader;
     private ResourceLoader resourceLoader;
 
+    private boolean multiple;
+
     public GuestPluginExecutor(PlatformExecutor executor, File location, Logger logger, String runtimeName,Properties loaderProperties, LoaderConfiguration configuration) {
         this.executor = executor;
         this.location = location;
@@ -64,6 +66,21 @@ public class GuestPluginExecutor {
         this.runtimeName = runtimeName;
         this.loaderProperties = loaderProperties;
         this.configuration = configuration;
+        this.multiple = false;
+    }
+
+    public boolean installMultiple(){
+        this.multiple = true;
+        try{
+            if(downloadResource(loaderProperties)){
+                setupLoader(null);
+            }else return false;
+        }catch (Exception exception){
+            logger.log(Level.SEVERE,String.format("Could not install plugin %s",exception.getMessage()));
+            exception.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public boolean install(){
@@ -97,7 +114,7 @@ public class GuestPluginExecutor {
             this.loader = new McNativeGuestPluginLoader(executor,this.runtimeName,this.logger,location,descriptionStream);
             return true;
         }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUKKIT)){
-            this.loader = new BukkitGuestPluginLoader(location,this.location);
+            this.loader = new BukkitGuestPluginLoader(location,this.location,multiple);
             return true;
         }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUNGEECORD)){
             return true;
@@ -203,6 +220,10 @@ public class GuestPluginExecutor {
                 .replace("{profile.qualifier}",resourceConfig.getQualifier());
     }
 
+    public String getGuestName(){
+        return loaderProperties.getProperty("plugin.name");
+    }
+
     public GuestPluginLoader getLoader() {
         return loader;
     }
@@ -220,10 +241,9 @@ public class GuestPluginExecutor {
     }
 
     private boolean isMcNativePlugin(File location){
+        if(multiple) return false;
         try {
-            InputStream fileInput = Files.newInputStream(location.toPath());
-
-            try (ZipInputStream input = new ZipInputStream(fileInput)) {
+            try (InputStream fileInput = Files.newInputStream(location.toPath()); ZipInputStream input = new ZipInputStream(fileInput)) {
                 ZipEntry entry = input.getNextEntry();
                 while (entry != null) {
                     if (entry.getName().equals("mcnative.json")) return true;

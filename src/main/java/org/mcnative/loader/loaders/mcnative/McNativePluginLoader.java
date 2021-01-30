@@ -42,7 +42,7 @@ public class McNativePluginLoader extends DefaultPluginLoader {
     private String pluginType;
 
     public McNativePluginLoader(PlatformExecutor executor, PluginManager pluginManager, RuntimeEnvironment<?> environment, PretronicLogger logger, PluginClassLoader classLoader, File location, PluginDescription description, boolean lifecycleLogging) {
-        super(pluginManager, environment, logger, classLoader, location, description, lifecycleLogging);
+        super(pluginManager, environment, logger, classLoader,"mcnative.json", location, description, lifecycleLogging);
         this.executor = executor;
         if(this.pluginType == null) this.pluginType = "mcnative";
     }

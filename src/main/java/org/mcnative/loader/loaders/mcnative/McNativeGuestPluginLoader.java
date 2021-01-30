@@ -25,8 +25,11 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     private final McNativePluginLoader loader;
 
     public McNativeGuestPluginLoader(PlatformExecutor executor, String runtimeName, Logger logger, File location, InputStream descriptionStream) {
-        PluginDescription description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
-                ,DocumentFileType.JSON.getReader().read(descriptionStream));
+        PluginDescription description = null;
+        if(descriptionStream != null){
+            description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
+                    ,DocumentFileType.JSON.getReader().read(descriptionStream));
+        }
 
         this.logger = logger;
         this.loader = new McNativePluginLoader(executor, McNative.getInstance().getPluginManager()

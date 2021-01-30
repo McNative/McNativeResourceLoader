@@ -18,11 +18,13 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
 
     private final File location;
     private final File loaderLocation;
+    private final boolean multiple;
     private Plugin plugin;
 
-    public BukkitGuestPluginLoader(File location,File loaderLocation){
+    public BukkitGuestPluginLoader(File location,File loaderLocation,boolean multiple){
         this.location = location;
         this.loaderLocation = loaderLocation;
+        this.multiple = multiple;
     }
 
     @Override
@@ -44,6 +46,7 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
             if(!folder.exists()) folder.mkdirs();
             LoaderUtil.changeFieldValue(JavaPlugin.class,plugin,"dataFolder",folder);
         } catch (InvalidPluginException | InvalidDescriptionException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -51,17 +54,18 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
     @SuppressWarnings("unchecked")
     @Override
     public void handlePluginEnable() {
-        if(Bukkit.getPluginManager() instanceof SimplePluginManager){
-            LoaderUtil.changeFieldValue(JavaPlugin.class,BukkitMcNativePluginBootstrap.INSTANCE,"isEnabled",false);
-            List<Plugin> plugins = (List<Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"plugins");
-            Map<String, Plugin> lookupNames = (Map<String, Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"lookupNames");
-            plugins.remove(BukkitMcNativePluginBootstrap.INSTANCE);
-            lookupNames.remove(BukkitMcNativePluginBootstrap.INSTANCE.getDescription().getName());
-        }else{
-            BukkitMcNativePluginBootstrap.INSTANCE.getLogger().log(Level.INFO,"Could not unregister loader plugin, this may cause issues");
-            Bukkit.getPluginManager().disablePlugin(BukkitMcNativePluginBootstrap.INSTANCE);
+        if(!multiple){
+            if(Bukkit.getPluginManager() instanceof SimplePluginManager){
+                LoaderUtil.changeFieldValue(JavaPlugin.class,BukkitMcNativePluginBootstrap.INSTANCE,"isEnabled",false);
+                List<Plugin> plugins = (List<Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"plugins");
+                Map<String, Plugin> lookupNames = (Map<String, Plugin>) LoaderUtil.getFieldValue(SimplePluginManager.class,Bukkit.getPluginManager(),"lookupNames");
+                plugins.remove(BukkitMcNativePluginBootstrap.INSTANCE);
+                lookupNames.remove(BukkitMcNativePluginBootstrap.INSTANCE.getDescription().getName());
+            }else{
+                BukkitMcNativePluginBootstrap.INSTANCE.getLogger().log(Level.INFO,"Could not unregister loader plugin, this may cause issues");
+                Bukkit.getPluginManager().disablePlugin(BukkitMcNativePluginBootstrap.INSTANCE);
+            }
         }
-
         Bukkit.getPluginManager().enablePlugin(plugin);
     }
 

@@ -73,8 +73,6 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
                 return;
             }
 
-            CertificateValidation.reset();
-
             this.executor.loadGuestPlugin();
 
             String version = this.executor.getLoader().getLoadedVersion();
@@ -88,6 +86,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             getProxy().getPluginManager().unregisterCommands(this);
             getProxy().getPluginManager().unregisterListeners(this);
         }
+        CertificateValidation.reset();
     }
 
     @Override
