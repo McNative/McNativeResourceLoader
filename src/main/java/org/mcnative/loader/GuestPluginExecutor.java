@@ -200,7 +200,6 @@ public class GuestPluginExecutor {
         }catch (Exception exception){
             exception.printStackTrace();
             if(current == null || current.equals(VersionInfo.UNKNOWN)){
-                exception.printStackTrace();
                 logger.info("(McNative-Loader) Download failed, shutting down");
                 logger.info("(McNative-Loader) Error: "+exception.getMessage());
                 return false;
