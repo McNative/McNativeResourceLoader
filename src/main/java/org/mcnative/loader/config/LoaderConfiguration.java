@@ -78,7 +78,7 @@ public class LoaderConfiguration {
     public ResourceConfig getResourceConfig(UUID id){
         Objects.requireNonNull(id);
         for (ResourceConfig config : resourceConfigs) {
-            if(config.getId() != null && config.getId().equals(id)) return config;
+             if(config.getId() != null && config.getId().equals(id)) return config;
         }
         return null;
     }
