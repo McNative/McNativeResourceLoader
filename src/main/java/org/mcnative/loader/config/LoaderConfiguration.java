@@ -149,6 +149,7 @@ public class LoaderConfiguration {
                     connection.setRequestProperty("NetworkSecret",McNativeConfig.getNetworkSecret());
 
                     if(connection.getResponseCode() == 200){
+                        cacheLocation.getParentFile().mkdirs();
                         this.resourceConfigs.clear();
                         InputStream input = connection.getInputStream();
                         Scanner scanner = new Scanner(input, StandardCharsets.UTF_8.name());
