@@ -36,11 +36,14 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
+    public static BungeeCordMcNativePluginBootstrap INSTANCE;
     private GuestPluginExecutor executor;
 
     @Override
     public void onLoad() {
+        INSTANCE = this;
         try{
+            CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
             McNativeConfig.load(CONFIG_YML);
 

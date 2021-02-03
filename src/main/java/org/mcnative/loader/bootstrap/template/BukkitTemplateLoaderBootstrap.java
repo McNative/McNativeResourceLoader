@@ -1,6 +1,5 @@
 package org.mcnative.loader.bootstrap.template;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
@@ -26,6 +25,7 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
     @Override
     public void onLoad() {
         try {
+            CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
 
             McNativeConfig.load(CONFIG_YML);;

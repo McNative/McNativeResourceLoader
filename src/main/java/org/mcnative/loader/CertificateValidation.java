@@ -20,7 +20,10 @@
 
 package org.mcnative.loader;
 
+import sun.misc.Unsafe;
+
 import javax.net.ssl.*;
+import java.lang.reflect.Field;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -65,5 +68,17 @@ public class CertificateValidation {
         if(VERIFIER == null || SSL_FACTORY == null) return;
         HttpsURLConnection.setDefaultHostnameVerifier(VERIFIER);
         HttpsURLConnection.setDefaultSSLSocketFactory(SSL_FACTORY);
+    }
+
+    public static void disableIllegalAccessWarning() {
+        try {
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            Unsafe u = (Unsafe) theUnsafe.get(null);
+
+            Class<?> cls = Class.forName("jdk.internal.module.IllegalAccessLogger");
+            Field logger = cls.getDeclaredField("logger");
+            u.putObjectVolatile(cls, u.staticFieldOffset(logger), null);
+        } catch (Exception ignored) {}
     }
 }

@@ -27,6 +27,7 @@ import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
 import org.mcnative.loader.config.ResourceConfig;
 import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
+import org.mcnative.loader.loaders.BungeeCordGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
 import org.mcnative.loader.utils.LoaderUtil;
@@ -117,6 +118,7 @@ public class GuestPluginExecutor {
             this.loader = new BukkitGuestPluginLoader(location,this.location,multiple);
             return true;
         }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUNGEECORD)){
+            this.loader = new BungeeCordGuestPluginLoader(location,this.location,multiple);
             return true;
         }else{
             logger.log(Level.SEVERE,"(Resource-Loader) No valid plugin manifest found");

@@ -55,6 +55,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
     public void onLoad() {
         INSTANCE = this;
         try{
+            CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
             McNativeConfig.load(CONFIG_YML);
 
