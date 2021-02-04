@@ -43,7 +43,7 @@
         <!-- Project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <dependency.mcnative.api>1.0.11.18-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.api>1.0.18.25-SNAPSHOT</dependency.mcnative.api>
         <dependency.mcnative.common>1.7.79.6-SNAPSHOT</dependency.mcnative.common>
 
         <!-- Dependency version -->

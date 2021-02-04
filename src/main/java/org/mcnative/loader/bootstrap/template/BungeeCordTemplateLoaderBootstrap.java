@@ -7,6 +7,7 @@ import org.mcnative.loader.config.McNativeConfig;
 import org.mcnative.loader.config.Template;
 import org.mcnative.loader.loaders.template.bungeecord.BungeeCordTemplateInjector;
 import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
+import org.mcnative.loader.utils.McNativeUtil;
 import org.mcnative.loader.utils.PrefixLogger;
 
 import java.io.File;
@@ -46,6 +47,8 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
                 getProxy().getPluginManager().unregisterListeners(this);
                 return;
             }
+
+            McNativeUtil.registerVariables(template);
 
             for (Map.Entry<String, String> resource : template.getResources().entrySet()) {
                 Properties properties = new Properties();
