@@ -30,6 +30,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -169,31 +170,15 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             try {
                 if(Class.forName("org.mcnative.runtime.api.McNative").getClassLoader() == classLoader){
                     getLogger().warning("Classes of "+getName()+" could not be unloaded, because this class loader is the host loader of McNative");
+                    BukkitUtil.clearCachedClasses(classLoader);
                     return;
                 }
             } catch (ClassNotFoundException ignored) {}
 
-            Map<String, Class<?>> classes = (Map<String, Class<?>>) LoaderUtil.getFieldValue(classLoader,"classes");
-            classes.clear();
-            clearCachedClasses(classLoader);
-
-            try {
-                ((URLClassLoader) classLoader).close();
-            } catch (IOException ignored) {}
+            BukkitUtil.closeLoader(classLoader);
         }
 
         System.gc();//Execute garbage collector
-    }
-
-    @SuppressWarnings("unchecked")
-    private void clearCachedClasses(ClassLoader classLoader){
-        Map<Pattern, PluginLoader> loaders = (Map<Pattern, PluginLoader>) LoaderUtil.getFieldValue(Bukkit.getPluginManager(),"fileAssociations");
-        for (Map.Entry<Pattern, PluginLoader> loader : loaders.entrySet()) {
-            if(loader.getValue() instanceof JavaPluginLoader){
-                Map<String, Class<?>> classes = (Map<String, Class<?>>) LoaderUtil.getFieldValue(loader.getValue(),"classes");
-                LoaderUtil.removeSilent(classes.entrySet(), entry -> entry.getValue().getClassLoader().equals(classLoader));
-            }
-        }
     }
 
 }

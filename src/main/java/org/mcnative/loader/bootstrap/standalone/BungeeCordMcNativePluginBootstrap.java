@@ -19,6 +19,7 @@
 
 package org.mcnative.loader.bootstrap.standalone;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
@@ -112,7 +113,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override

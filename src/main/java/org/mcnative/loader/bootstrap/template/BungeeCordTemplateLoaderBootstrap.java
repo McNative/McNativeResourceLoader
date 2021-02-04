@@ -1,13 +1,12 @@
 package org.mcnative.loader.bootstrap.template;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.McNativeConfig;
 import org.mcnative.loader.config.Template;
-import org.mcnative.loader.loaders.template.bukkit.BukkitTemplateLoaderInjector;
+import org.mcnative.loader.loaders.template.bungeecord.BungeeCordTemplateInjector;
 import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
-import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.PrefixLogger;
 
 import java.io.File;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
-public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements PlatformExecutor {
+public class BungeeCordTemplateLoaderBootstrap extends Plugin implements PlatformExecutor {
 
     private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
@@ -37,12 +36,14 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
 
             Template template = Template.pullTemplate(getLogger(),config);
             if(template == null){
-                getServer().getPluginManager().disablePlugin(this);
+                getProxy().getPluginManager().unregisterCommands(this);
+                getProxy().getPluginManager().unregisterListeners(this);
                 return;
             }
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, config)){
-                getServer().getPluginManager().disablePlugin(this);
+            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, config)){
+                getProxy().getPluginManager().unregisterCommands(this);
+                getProxy().getPluginManager().unregisterListeners(this);
                 return;
             }
 
@@ -52,10 +53,10 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
                 properties.setProperty("plugin.id",resource.getValue());
                 GuestPluginExecutor executor = new GuestPluginExecutor(this,getFile()
                         ,new PrefixLogger(getLogger(),resource.getKey())
-                        ,EnvironmentNames.BUKKIT,properties,config);
+                        ,EnvironmentNames.BUNGEECORD,properties,config);
                 this.executors.add(executor);
                 try {
-                    executor.installMultiple(new BukkitTemplateLoaderInjector());
+                    executor.installMultiple(new BungeeCordTemplateInjector());
                 }catch (Exception e){
                     getLogger().log(Level.SEVERE,"Could not install plugin "+resource.getKey());
                     e.printStackTrace();
@@ -73,7 +74,8 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
         }catch (Exception exception){
             getLogger().log(Level.SEVERE,"Failed to start McNative template loader "+exception.getMessage());
             exception.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
+            getProxy().getPluginManager().unregisterCommands(this);
+            getProxy().getPluginManager().unregisterListeners(this);
         }
         CertificateValidation.reset();
     }
@@ -91,6 +93,11 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
     }
 
     @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
     public void shutdown() {
         throw new UnsupportedOperationException("It is not possible to shutdown the McNative template loader");
     }
@@ -102,9 +109,7 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
 
     @Override
     public void unload() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        BukkitUtil.closeLoader(classLoader);
-        System.gc();//Execute garbage collector
+
     }
 
 }

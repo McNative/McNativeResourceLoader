@@ -62,9 +62,7 @@ public class BungeeCordGuestPluginLoader implements GuestPluginLoader {
     }
 
     @Override
-    public void handlePluginDisable() {
-
-    }
+    public void handlePluginDisable() {}
 
     private PluginDescription loadPluginDescription(File file){
         if ( file.isFile() && file.getName().endsWith( ".jar" ) ) {
@@ -92,6 +90,7 @@ public class BungeeCordGuestPluginLoader implements GuestPluginLoader {
         throw new IllegalArgumentException("file not found");
     }
 
+    @SuppressWarnings("unchecked")
     private Plugin loadPlugin(PluginDescription description){
         try
         {
@@ -109,7 +108,7 @@ public class BungeeCordGuestPluginLoader implements GuestPluginLoader {
             clazz.onLoad();
             ProxyServer.getInstance().getLogger().log( Level.INFO, "Loaded plugin {0} version {1} by {2}"
                     , new Object[]{description.getName(), description.getVersion(), description.getAuthor()});
-            return plugin;
+            return clazz;
         } catch ( Throwable t ) {
             ProxyServer.getInstance().getLogger().log(Level.WARNING, "Error enabling plugin " + description.getName(),t);
             throw new IllegalArgumentException(t);

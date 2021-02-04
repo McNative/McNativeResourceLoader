@@ -30,6 +30,7 @@ import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.BungeeCordGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
+import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -58,7 +59,9 @@ public class GuestPluginExecutor {
     private GuestPluginLoader loader;
     private ResourceLoader resourceLoader;
 
+    private TemplateLoaderInjector injector;
     private boolean multiple;
+    private boolean mcnative;
 
     public GuestPluginExecutor(PlatformExecutor executor, File location, Logger logger, String runtimeName,Properties loaderProperties, LoaderConfiguration configuration) {
         this.executor = executor;
@@ -68,10 +71,12 @@ public class GuestPluginExecutor {
         this.loaderProperties = loaderProperties;
         this.configuration = configuration;
         this.multiple = false;
+        this.mcnative = false;
     }
 
-    public boolean installMultiple(){
+    public boolean installMultiple(TemplateLoaderInjector injector){
         this.multiple = true;
+        this.injector = injector;
         try{
             if(downloadResource(loaderProperties)){
                 setupLoader(null);
@@ -108,11 +113,12 @@ public class GuestPluginExecutor {
         }
         File location = resourceLoader != null ? resourceLoader.getLocalFile(resourceLoader.getCurrentVersion()) : this.location;
         if(descriptionStream != null || isMcNativePlugin(location)){
+            ClassLoader classLoader = getClass().getClassLoader();
             if(descriptionStream == null){
-                ClassLoader classLoader = getClass().getClassLoader();
-                resourceLoader.loadReflected((URLClassLoader) classLoader);
+                if(injector != null) classLoader = injector.getClassLoader(this,location);
+                else resourceLoader.loadReflected((URLClassLoader) classLoader);
             }
-            this.loader = new McNativeGuestPluginLoader(executor,this.runtimeName,this.logger,location,descriptionStream);
+            this.loader = new McNativeGuestPluginLoader(executor,this.runtimeName,this.logger,location,classLoader,descriptionStream);
             return true;
         }else if(runtimeName.equalsIgnoreCase(EnvironmentNames.BUKKIT)){
             this.loader = new BukkitGuestPluginLoader(location,this.location,multiple);
@@ -225,11 +231,16 @@ public class GuestPluginExecutor {
         return loaderProperties.getProperty("plugin.name");
     }
 
+    public String getGuestVersion(){
+        return resourceLoader.getCurrentVersion().getName();
+    }
+
     public GuestPluginLoader getLoader() {
         return loader;
     }
 
     public void loadGuestPlugin(){
+        if(this.mcnative && injector != null) injector.handleEnable(this);
         loader.handlePluginLoad();
     }
 
@@ -242,12 +253,14 @@ public class GuestPluginExecutor {
     }
 
     private boolean isMcNativePlugin(File location){
-        if(multiple) return false;
         try {
             try (InputStream fileInput = Files.newInputStream(location.toPath()); ZipInputStream input = new ZipInputStream(fileInput)) {
                 ZipEntry entry = input.getNextEntry();
                 while (entry != null) {
-                    if (entry.getName().equals("mcnative.json")) return true;
+                    if (entry.getName().equals("mcnative.json")){
+                        this.mcnative = true;
+                        return true;
+                    }
                     entry = input.getNextEntry();
                 }
                 return false;

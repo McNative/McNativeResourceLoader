@@ -24,7 +24,7 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     private final Logger logger;
     private final McNativePluginLoader loader;
 
-    public McNativeGuestPluginLoader(PlatformExecutor executor, String runtimeName, Logger logger, File location, InputStream descriptionStream) {
+    public McNativeGuestPluginLoader(PlatformExecutor executor, String runtimeName, Logger logger, File location,ClassLoader classLoader, InputStream descriptionStream) {
         PluginDescription description = null;
         if(descriptionStream != null){
             description = DefaultPluginDescription.create(McNative.getInstance().getPluginManager()
@@ -34,7 +34,7 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
         this.logger = logger;
         this.loader = new McNativePluginLoader(executor, McNative.getInstance().getPluginManager()
                 ,new RuntimeEnvironment<>(runtimeName,McNative.getInstance())
-                ,new JdkPretronicLogger(logger),new BridgedPluginClassLoader(getClass().getClassLoader())
+                ,new JdkPretronicLogger(logger),new BridgedPluginClassLoader(classLoader)
                 ,location,description,false);
         installDependencies();
     }
@@ -60,6 +60,7 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     @Override
     public void handlePluginEnable() {
         loader.bootstrapInternal();
+
     }
 
     @Override
