@@ -190,26 +190,24 @@ public class LoaderConfiguration {
     }
 
     public void save(File file) {
-        if(isLocalManaged()){
-            try{
-                file.getParentFile().mkdirs();
-                if(!file.exists()) file.createNewFile();
+        try{
+            file.getParentFile().mkdirs();
+            if(!file.exists()) file.createNewFile();
 
-                Map<String,DummyResourceSection> localProfile = new LinkedHashMap<>();
-                for (ResourceConfig resourceConfig : getResourceConfigs()) {
-                    localProfile.put(resourceConfig.getName(),new DummyResourceSection(resourceConfig.getQualifier(),resourceConfig.getVersion()));
-                }
-
-                Map<String,Object> output = new LinkedHashMap<>();
-                output.put("endpoint",getEndpoint());
-                output.put("template",getTemplate());
-                output.put("profile",getProfile());
-                output.put("localProfile",localProfile);
-
-                YAML.dump(output,new FileWriter(file));
-            }catch (Exception exception){
-                exception.printStackTrace();
+            Map<String,DummyResourceSection> localProfile = new LinkedHashMap<>();
+            for (ResourceConfig resourceConfig : getResourceConfigs()) {
+                localProfile.put(resourceConfig.getName(),new DummyResourceSection(resourceConfig.getQualifier(),resourceConfig.getVersion()));
             }
+
+            Map<String,Object> output = new LinkedHashMap<>();
+            output.put("endpoint",getEndpoint());
+            output.put("template",getTemplate());
+            output.put("profile",getProfile());
+            output.put("localProfile",localProfile);
+
+            YAML.dump(output,new FileWriter(file));
+        }catch (Exception exception){
+            exception.printStackTrace();
         }
     }
 
