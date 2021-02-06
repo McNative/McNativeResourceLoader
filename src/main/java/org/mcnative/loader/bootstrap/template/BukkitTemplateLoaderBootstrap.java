@@ -3,12 +3,10 @@ package org.mcnative.loader.bootstrap.template;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.Template;
 import org.mcnative.loader.loaders.template.bukkit.BukkitTemplateLoaderInjector;
-import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
 import org.mcnative.loader.utils.BukkitUtil;
-import org.mcnative.loader.utils.McNativeUtil;
 import org.mcnative.loader.utils.PrefixLogger;
 
 import java.io.File;
@@ -32,7 +30,7 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
             CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
 
-            McNativeConfig.load(CONFIG_YML);;
+            CredentialsConfig.load(CONFIG_YML);;
             LoaderConfiguration config = LoaderConfiguration.load(LOADER_YML);
             config.pullProfiles(getLogger(),LOADER_CACHE);
 
@@ -42,12 +40,10 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
                 return;
             }
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, config)){
+            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, config,template.getVariables())){
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
-
-            McNativeUtil.registerVariables(template);
 
             for (Map.Entry<String, String> resource : template.getResources().entrySet()) {
                 Properties properties = new Properties();

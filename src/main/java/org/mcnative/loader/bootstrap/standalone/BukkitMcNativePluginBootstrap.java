@@ -24,24 +24,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 
 public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listener, PlatformExecutor {
 
@@ -58,7 +55,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
         try{
             CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
-            McNativeConfig.load(CONFIG_YML);
+            CredentialsConfig.load(CONFIG_YML);
 
             InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
             Properties loaderProperties = new Properties();

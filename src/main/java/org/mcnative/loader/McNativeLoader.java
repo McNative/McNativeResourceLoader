@@ -23,7 +23,7 @@ import net.pretronic.libraries.resourceloader.ResourceInfo;
 import net.pretronic.libraries.resourceloader.ResourceLoader;
 import net.pretronic.libraries.resourceloader.VersionInfo;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.ResourceConfig;
 
 import java.io.File;
@@ -49,22 +49,26 @@ public class McNativeLoader extends ResourceLoader {
     private final Logger logger;
     private final String platform;
     private final LoaderConfiguration configuration;
+    private final Map<String,String> variables;
 
     static {
         PLATFORM_IDS.put("bukkit","d8b38fc3-189a-488e-aabc-87570e15646c");
         PLATFORM_IDS.put("bungeecord","22ce19f7-9ae8-45ef-9c09-659fc4c9a841");
     }
 
-    public McNativeLoader(Logger logger, String platform, LoaderConfiguration configuration) {
+    public McNativeLoader(Logger logger, String platform, LoaderConfiguration configuration,Map<String,String> variables) {
         super(MCNATIVE);
         this.logger = logger;
         this.platform = platform;
         this.configuration = configuration;
+        this.variables = variables;
 
-        if(McNativeConfig.isAvailable()){
+        if(CredentialsConfig.isAvailable()){
+            this.variables.put("mcnative.networkId",CredentialsConfig.getNetworkId());
+            this.variables.put("mcnative.secret",CredentialsConfig.getNetworkSecret());
             MCNATIVE.setAuthenticator(httpURLConnection -> {
-                httpURLConnection.setRequestProperty("networkId", McNativeConfig.getNetworkId());
-                httpURLConnection.setRequestProperty("networkSecret", McNativeConfig.getNetworkSecret());
+                httpURLConnection.setRequestProperty("networkId", CredentialsConfig.getNetworkId());
+                httpURLConnection.setRequestProperty("networkSecret", CredentialsConfig.getNetworkSecret());
             });
         }
     }
@@ -154,8 +158,8 @@ public class McNativeLoader extends ResourceLoader {
         try{
             loadReflected((URLClassLoader) getClass().getClassLoader());
             Class<?> mcNativeClass = getClass().getClassLoader().loadClass("org.mcnative.runtime."+this.platform.toLowerCase()+".McNativeLauncher");
-            Method launchMethod = mcNativeClass.getMethod("launchMcNative");
-            launchMethod.invoke(null);
+            Method launchMethod = mcNativeClass.getMethod("launchMcNative",Map.class);
+            launchMethod.invoke(null,this.variables);
             return true;
         }catch (Exception exception){
             logger.log(Level.SEVERE,"Could not launch McNative.",exception);
@@ -164,7 +168,11 @@ public class McNativeLoader extends ResourceLoader {
     }
 
     public static boolean install(Logger logger, String platform, LoaderConfiguration configuration){
-        return new McNativeLoader(logger,platform,configuration).install();
+        return install(logger,platform,configuration,new HashMap<>());
+    }
+
+    public static boolean install(Logger logger, String platform, LoaderConfiguration configuration,Map<String,String> variables){
+        return new McNativeLoader(logger,platform,configuration,variables).install();
     }
 
 }

@@ -19,11 +19,10 @@
 
 package org.mcnative.loader.bootstrap.standalone;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -46,7 +45,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
         try{
             CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
-            McNativeConfig.load(CONFIG_YML);
+            CredentialsConfig.load(CONFIG_YML);
 
             InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
             Properties loaderProperties = new Properties();

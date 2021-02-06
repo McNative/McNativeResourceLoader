@@ -3,11 +3,9 @@ package org.mcnative.loader.bootstrap.template;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.Template;
 import org.mcnative.loader.loaders.template.bungeecord.BungeeCordTemplateInjector;
-import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
-import org.mcnative.loader.utils.McNativeUtil;
 import org.mcnative.loader.utils.PrefixLogger;
 
 import java.io.File;
@@ -31,7 +29,7 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
             CertificateValidation.disableIllegalAccessWarning();
             CertificateValidation.disable();
 
-            McNativeConfig.load(CONFIG_YML);;
+            CredentialsConfig.load(CONFIG_YML);;
             LoaderConfiguration config = LoaderConfiguration.load(LOADER_YML);
             config.pullProfiles(getLogger(),LOADER_CACHE);
 
@@ -42,13 +40,11 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
                 return;
             }
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, config)){
+            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, config,template.getVariables())){
                 getProxy().getPluginManager().unregisterCommands(this);
                 getProxy().getPluginManager().unregisterListeners(this);
                 return;
             }
-
-            McNativeUtil.registerVariables(template);
 
             for (Map.Entry<String, String> resource : template.getResources().entrySet()) {
                 Properties properties = new Properties();

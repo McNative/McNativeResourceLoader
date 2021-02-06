@@ -8,8 +8,11 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-public class McNativeConfig {
+public class CredentialsConfig {
 
     private static String NETWORK_ID = null;
     private static String NETWORK_SECRET = null;
@@ -22,9 +25,9 @@ public class McNativeConfig {
         dumper.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumper.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
         dumper.setPrettyFlow(true);
-        CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(McNativeConfig.class,McNativeConfig.class.getClassLoader());
+        CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(CredentialsConfig.class, CredentialsConfig.class.getClassLoader());
 
-        TypeDescription configDesc = new TypeDescription(McNativeConfig.class);
+        TypeDescription configDesc = new TypeDescription(CredentialsConfig.class);
         constructor.addTypeDescription(configDesc);
 
         Representer representer = new Representer();
@@ -35,14 +38,25 @@ public class McNativeConfig {
     }
 
     public static void load(File location){
-        if(!location.exists()) return;
-        try {
-            DummyConfig config = YAML.loadAs(new FileInputStream(location),DummyConfig.class);
-            if(config.console == null) return;
-            NETWORK_ID = config.console.networkId;
-            NETWORK_SECRET = config.console.secret;
-        }catch (Exception e){
-            e.printStackTrace();
+        InputStream stream = CredentialsConfig.class.getClassLoader().getResourceAsStream("credentials.properties");
+        if(stream != null){
+            Properties properties = new Properties();
+            try {
+                properties.load(stream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            NETWORK_ID = properties.getProperty("networkId");
+            NETWORK_SECRET = properties.getProperty("secret");
+        }else if(location.exists()){
+            try {
+                DummyConfig config = YAML.loadAs(new FileInputStream(location),DummyConfig.class);
+                if(config.console == null) return;
+                NETWORK_ID = config.console.networkId;
+                NETWORK_SECRET = config.console.secret;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

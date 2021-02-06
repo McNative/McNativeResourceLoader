@@ -24,7 +24,7 @@ import net.pretronic.libraries.resourceloader.ResourceInfo;
 import net.pretronic.libraries.resourceloader.ResourceLoader;
 import net.pretronic.libraries.resourceloader.VersionInfo;
 import org.mcnative.loader.config.LoaderConfiguration;
-import org.mcnative.loader.config.McNativeConfig;
+import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.ResourceConfig;
 import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.BungeeCordGuestPluginLoader;
@@ -144,16 +144,16 @@ public class GuestPluginExecutor {
         info.setDownloadUrl(replaceLoaderVariables(loader,config,DOWNLOAD_URL));
         resourceLoader = new ResourceLoader(info);
 
-        if(McNativeConfig.isAvailable()){
+        if(CredentialsConfig.isAvailable()){
             info.setAuthenticator(httpURLConnection -> {
-                httpURLConnection.setRequestProperty("networkId",McNativeConfig.getNetworkId());
-                httpURLConnection.setRequestProperty("networkSecret",McNativeConfig.getNetworkSecret());
+                httpURLConnection.setRequestProperty("networkId", CredentialsConfig.getNetworkId());
+                httpURLConnection.setRequestProperty("networkSecret", CredentialsConfig.getNetworkSecret());
             });
         }else{
             String licenseKey = getLicenseKey(name);
             if(licenseKey != null){
                 info.setAuthenticator(httpURLConnection -> {
-                    httpURLConnection.setRequestProperty("licenseKey",McNativeConfig.getNetworkId());
+                    httpURLConnection.setRequestProperty("licenseKey", CredentialsConfig.getNetworkId());
                 });
             }
         }

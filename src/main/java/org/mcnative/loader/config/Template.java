@@ -3,7 +3,6 @@ package org.mcnative.loader.config;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -36,8 +35,8 @@ public class Template {
             HttpURLConnection connection = (HttpURLConnection)new URL(config.getEndpoint("v1/templates/"+config.getTemplate()+"?plain=true")).openConnection();
             connection.setDoOutput(true);
             connection.setRequestProperty("Accept-Charset", "UTF-8");
-            connection.setRequestProperty("NetworkId",McNativeConfig.getNetworkId());
-            connection.setRequestProperty("NetworkSecret",McNativeConfig.getNetworkSecret());
+            connection.setRequestProperty("NetworkId", CredentialsConfig.getNetworkId());
+            connection.setRequestProperty("NetworkSecret", CredentialsConfig.getNetworkSecret());
 
             if(connection.getResponseCode() == 200){
                 InputStream input = connection.getInputStream();
@@ -46,12 +45,12 @@ public class Template {
 
                 for (String resources : properties.getProperty("resources").split(";")) {
                     String[] parts = resources.split(":");
-                    template.getResources().put(parts[0],parts[1]);
+                    if(parts.length > 1) template.getResources().put(parts[0],parts[1]);
                 }
 
                 for (String resources : properties.getProperty("variables").split(";")) {
                     String[] parts = resources.split(":");
-                    template.getVariables().put(parts[0],parts[1]);
+                    if(parts.length > 1) template.getVariables().put(parts[0],parts[1]);
                 }
 
             }else{

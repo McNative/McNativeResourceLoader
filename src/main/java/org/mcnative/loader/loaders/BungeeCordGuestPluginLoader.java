@@ -96,7 +96,8 @@ public class BungeeCordGuestPluginLoader implements GuestPluginLoader {
         {
             Class<?> loaderClass = Class.forName("net.md_5.bungee.api.plugin.PluginClassloader");
             Constructor<?> constructor = loaderClass.getDeclaredConstructors()[0];
-            URLClassLoader loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), plugin, new URL[]{plugin.getFile().toURI().toURL() });
+            constructor.setAccessible(true);
+            URLClassLoader loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new URL[]{location.toURI().toURL()});
 
             //Inject new loader
             Set loaders = LoaderUtil.getFieldValue(loaderClass,"allLoaders",Set.class);

@@ -126,7 +126,7 @@ public class LoaderConfiguration {
 
     public boolean pullProfiles(Logger logger, File cacheLocation){
         if(isRemoteManaged()){
-            if(McNativeConfig.isAvailable()){
+            if(CredentialsConfig.isAvailable()){
                 boolean available = false;
                 if(cacheLocation.exists()){
                     try (Scanner scanner = new Scanner(cacheLocation, StandardCharsets.UTF_8.name())) {
@@ -145,8 +145,8 @@ public class LoaderConfiguration {
                     HttpURLConnection connection = (HttpURLConnection)new URL(getEndpoint("v1/profiles/"+profile+"?plain=true")).openConnection();
                     connection.setDoOutput(true);
                     connection.setRequestProperty("Accept-Charset", "UTF-8");
-                    connection.setRequestProperty("NetworkId",McNativeConfig.getNetworkId());
-                    connection.setRequestProperty("NetworkSecret",McNativeConfig.getNetworkSecret());
+                    connection.setRequestProperty("NetworkId", CredentialsConfig.getNetworkId());
+                    connection.setRequestProperty("NetworkSecret", CredentialsConfig.getNetworkSecret());
 
                     if(connection.getResponseCode() == 200){
                         cacheLocation.getParentFile().mkdirs();
@@ -214,7 +214,10 @@ public class LoaderConfiguration {
     }
 
     public static LoaderConfiguration load(File location) throws Exception{
-        if(location.exists()) return YAML.loadAs(new FileInputStream(location),LoaderConfiguration.class);
+        InputStream stream = LoaderConfiguration.class.getClassLoader().getResourceAsStream("loader.yml");
+        if(stream == null && location.exists()) stream = new FileInputStream(location);
+
+        if(stream != null) return YAML.loadAs(stream,LoaderConfiguration.class);
         else return new LoaderConfiguration();
     }
 
