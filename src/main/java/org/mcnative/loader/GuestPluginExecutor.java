@@ -161,7 +161,7 @@ public class GuestPluginExecutor {
         VersionInfo current = resourceLoader.getCurrentVersion();
         VersionInfo latest = VersionInfo.UNKNOWN;
 
-        logger.log(Level.SEVERE,"(Resource-Loader) Server: "+configuration.getEndpoint()+", Qualifier: "+config.getQualifier());
+        logger.log(Level.INFO,"(Resource-Loader) Server: "+configuration.getEndpoint()+", Qualifier: "+config.getQualifier());
         try{
             latest = resourceLoader.getLatestVersion();
         }catch (Exception exception){
