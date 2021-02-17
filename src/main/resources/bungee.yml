@@ -8,7 +8,7 @@ softDepends:
   - 'ViaVersion'
   - 'CloudNetAPI'
   - 'Vault'
-  - 'PlaceHolderApi'
+  - 'PlaceholderAPI'
   - 'ProtocolLib'
 main: 'org.mcnative.loader.bootstrap.template.BungeeCordTemplateLoaderBootstrap'
 version: '${project.version}'

@@ -8,7 +8,7 @@ softdepend:
   - 'ViaVersion'
   - 'CloudNetAPI'
   - 'Vault'
-  - 'PlaceHolderApi'
+  - 'PlaceholderAPI'
   - 'ProtocolLib'
 main: 'org.mcnative.loader.bootstrap.template.BukkitTemplateLoaderBootstrap'
 version: '${project.version}'
