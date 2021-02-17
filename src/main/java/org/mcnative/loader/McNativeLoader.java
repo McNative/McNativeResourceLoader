@@ -174,5 +174,4 @@ public class McNativeLoader extends ResourceLoader {
     public static boolean install(Logger logger, String platform, LoaderConfiguration configuration,Map<String,String> variables){
         return new McNativeLoader(logger,platform,configuration,variables).install();
     }
-
 }
