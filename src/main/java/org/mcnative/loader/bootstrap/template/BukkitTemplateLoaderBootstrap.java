@@ -35,10 +35,6 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
             config.pullProfiles(getLogger(),LOADER_CACHE);
 
             Template template = Template.pullTemplate(getLogger(),config);
-            if(template == null){
-                getServer().getPluginManager().disablePlugin(this);
-                return;
-            }
 
             if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, config,template.getVariables())){
                 getServer().getPluginManager().disablePlugin(this);

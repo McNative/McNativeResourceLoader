@@ -76,6 +76,8 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 }
             }
 
+            configuration.save(LOADER_YML);
+
             this.executor = new GuestPluginExecutor(this,getFile(),getLogger(),EnvironmentNames.BUKKIT,loaderProperties,configuration);
 
             if(!this.executor.install()){
@@ -83,8 +85,6 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
-
-            configuration.save(LOADER_YML);
 
             this.executor.loadGuestPlugin();
 

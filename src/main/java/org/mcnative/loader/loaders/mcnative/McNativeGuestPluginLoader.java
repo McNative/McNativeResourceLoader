@@ -60,7 +60,6 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     @Override
     public void handlePluginEnable() {
         loader.bootstrapInternal();
-
     }
 
     @Override
