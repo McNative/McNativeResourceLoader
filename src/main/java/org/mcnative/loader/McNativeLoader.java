@@ -90,7 +90,7 @@ public class McNativeLoader extends ResourceLoader {
         if(id == null) throw new UnsupportedOperationException("Platform "+platform+" is not supported");
 
         ResourceConfig config = configuration.getResourceConfig(UUID.fromString(id));
-        if(config == null) config = configuration.getResourceConfig("mcnative");
+        if(config == null) config = configuration.getResourceConfig("McNative");
 
         MCNATIVE.setVersionUrl(VERSION_URL
                 .replace("{profile.server}",configuration.getEndpoint())
