@@ -214,7 +214,7 @@ public class GuestPluginExecutor {
                 return false;
             }else{
                 logger.info("(McNative-Loader) --------------------------------");
-                logger.info("(McNative-Loader) download failed, trying to start an older version");
+                logger.info("(McNative-Loader) Download failed, trying to start an older version");
                 logger.info("(McNative-Loader) Error: "+exception.getMessage());
                 logger.info("(McNative-Loader) --------------------------------");
             }
