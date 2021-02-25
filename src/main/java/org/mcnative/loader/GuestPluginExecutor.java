@@ -206,14 +206,17 @@ public class GuestPluginExecutor {
             loader.download(latest);
             logger.info("(McNative-Loader) Successfully downloaded McNative");
         }catch (Exception exception){
-            exception.printStackTrace();
             if(current == null || current.equals(VersionInfo.UNKNOWN)){
+                logger.info("(McNative-Loader) --------------------------------");
                 logger.info("(McNative-Loader) Download failed, shutting down");
                 logger.info("(McNative-Loader) Error: "+exception.getMessage());
+                logger.info("(McNative-Loader) --------------------------------");
                 return false;
             }else{
+                logger.info("(McNative-Loader) --------------------------------");
                 logger.info("(McNative-Loader) download failed, trying to start an older version");
                 logger.info("(McNative-Loader) Error: "+exception.getMessage());
+                logger.info("(McNative-Loader) --------------------------------");
             }
         }
         return true;
