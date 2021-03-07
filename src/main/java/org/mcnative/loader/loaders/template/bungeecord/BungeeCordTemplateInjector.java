@@ -23,7 +23,7 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
     @Override
     public ClassLoader getClassLoader(GuestPluginExecutor executor,File location) {
         PluginDescription description = new PluginDescription();
-        description.setName(executor.getGuestVersion());
+        description.setName(executor.getGuestName());
         description.setVersion(executor.getGuestVersion());
         description.setMain("reflected");
 
