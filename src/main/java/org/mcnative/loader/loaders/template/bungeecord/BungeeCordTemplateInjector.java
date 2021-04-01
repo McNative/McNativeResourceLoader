@@ -39,7 +39,7 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
             URLClassLoader loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new URL[]{location.toURI().toURL()});
 
             //Change parent class loader to root loader
-            ReflectionUtil.changeFieldValue(ClassLoader.class,loader,"parent",new InjectedParentLoader(plugin.getDescription().getName()));
+            ReflectionUtil.changeFieldValue(ClassLoader.class,loader,"parent",ProxyServer.class.getClassLoader());
             return loader;
         }catch (Exception e){
             throw new UnsupportedOperationException(e);
