@@ -148,12 +148,14 @@ public class GuestPluginExecutor {
             info.setAuthenticator(httpURLConnection -> {
                 httpURLConnection.setRequestProperty("networkId", CredentialsConfig.getNetworkId());
                 httpURLConnection.setRequestProperty("networkSecret", CredentialsConfig.getNetworkSecret());
+                httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");//Work around
             });
         }else{
             String licenseKey = getLicenseKey(name);
             if(licenseKey != null){
                 info.setAuthenticator(httpURLConnection -> {
                     httpURLConnection.setRequestProperty("licenseKey", licenseKey);
+                    httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");//Work around
                 });
             }
         }
