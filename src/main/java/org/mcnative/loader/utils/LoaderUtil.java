@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -12,7 +13,7 @@ import java.util.function.Predicate;
 public class LoaderUtil {
 
     public static String readAllText(File file) {
-        return readAllText(file, Charset.defaultCharset());
+        return readAllText(file, StandardCharsets.UTF_8);
     }
 
     public static String readAllText(File file, Charset charset) {
