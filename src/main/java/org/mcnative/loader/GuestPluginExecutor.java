@@ -153,7 +153,7 @@ public class GuestPluginExecutor {
             String licenseKey = getLicenseKey(name);
             if(licenseKey != null){
                 info.setAuthenticator(httpURLConnection -> {
-                    httpURLConnection.setRequestProperty("licenseKey", CredentialsConfig.getNetworkId());
+                    httpURLConnection.setRequestProperty("licenseKey", licenseKey);
                 });
             }
         }
