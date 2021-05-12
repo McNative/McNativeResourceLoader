@@ -39,9 +39,9 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
             constructor.setAccessible(true);
             URLClassLoader loader;
 
-            //
+            //ClassLoader
             if(constructor.getParameterCount() == 4){
-                loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new URL[]{location.toURI().toURL()},ProxyServer.class.getClassLoader());
+                loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, location,ProxyServer.class.getClassLoader());
             }else {
                 if(SystemUtil.getJavaBaseVersion() > 16){
                     throw new UnsupportedOperationException("McNative Template loader does not support the current BungeeCord build with Java 16, please update to the latest BungeeCord version.");
