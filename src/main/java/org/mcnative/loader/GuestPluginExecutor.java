@@ -30,7 +30,7 @@ import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.BungeeCordGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
-import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -59,12 +59,13 @@ public class GuestPluginExecutor {
     private GuestPluginLoader loader;
     private ResourceLoader resourceLoader;
 
-    private TemplateLoaderInjector injector;
+    private ClassLoaderInjector injector;
     private boolean multiple;
     private boolean mcnative;
 
-    public GuestPluginExecutor(PlatformExecutor executor, File location, Logger logger, String runtimeName,Properties loaderProperties, LoaderConfiguration configuration) {
+    public GuestPluginExecutor(PlatformExecutor executor,ClassLoaderInjector injector, File location, Logger logger, String runtimeName,Properties loaderProperties, LoaderConfiguration configuration) {
         this.executor = executor;
+        this.injector = injector;
         this.location = location;
         this.logger = logger;
         this.runtimeName = runtimeName;
@@ -74,9 +75,8 @@ public class GuestPluginExecutor {
         this.mcnative = false;
     }
 
-    public boolean installMultiple(TemplateLoaderInjector injector){
+    public boolean installMultiple(){
         this.multiple = true;
-        this.injector = injector;
         try{
             if(downloadResource(loaderProperties)){
                 setupLoader(null);
@@ -254,6 +254,7 @@ public class GuestPluginExecutor {
     }
 
     public void disableGuestPlugin(){
+        injector.handleDisable(this);
         loader.handlePluginDisable();
     }
 

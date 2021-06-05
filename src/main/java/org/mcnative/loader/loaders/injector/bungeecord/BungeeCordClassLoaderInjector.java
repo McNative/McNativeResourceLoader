@@ -1,13 +1,12 @@
-package org.mcnative.loader.loaders.template.bungeecord;
+package org.mcnative.loader.loaders.injector.bungeecord;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
-import net.pretronic.libraries.utility.SystemUtil;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
 import org.mcnative.loader.GuestPluginExecutor;
-import org.mcnative.loader.loaders.template.TemplateLoaderInjector;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -16,9 +15,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 
-public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
+public class BungeeCordClassLoaderInjector implements ClassLoaderInjector {
 
     private BungeeCordDummyPlugin plugin;
+
+    @Override
+    public ClassLoader loadMcNativeClasses(File location) {
+        PluginDescription description = new PluginDescription();
+        description.setName("McNative (injected class loader)");
+        description.setVersion("");
+        description.setMain("reflected");
+        return createClassLoader(description,location);
+    }
 
     @Override
     public ClassLoader getClassLoader(GuestPluginExecutor executor,File location) {
@@ -32,8 +40,11 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
                 ,new Class[]{ProxyServer.class,PluginDescription.class}
                 ,new Object[]{ProxyServer.getInstance(),description});
 
+        return createClassLoader(description,location);
+    }
+
+    private ClassLoader createClassLoader(PluginDescription description,File location){
         try{
-            //ProxyServer proxy, PluginDescription desc, File file, ClassLoader libraryLoader
             Class<?> loaderClass = Class.forName("net.md_5.bungee.api.plugin.PluginClassloader");
             Constructor<?> constructor = loaderClass.getDeclaredConstructors()[0];
             constructor.setAccessible(true);
@@ -43,10 +54,6 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
             if(constructor.getParameterCount() == 4){
                 loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, location,ProxyServer.class.getClassLoader());
             }else {
-                if(SystemUtil.getJavaBaseVersion() > 16){
-                    throw new UnsupportedOperationException("McNative Template loader does not support the current BungeeCord build with Java 16, please update to the latest BungeeCord version.");
-                }
-
                 loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new URL[]{location.toURI().toURL()});
                 //Change parent class loader to root loader
                 ReflectionUtil.changeFieldValue(ClassLoader.class,loader,"parent",ProxyServer.class.getClassLoader());
@@ -64,5 +71,10 @@ public class BungeeCordTemplateInjector implements TemplateLoaderInjector {
         Map<String, Plugin> plugins = (Map<String, Plugin>) LoaderUtil.getFieldValue(ProxyServer.getInstance().getPluginManager(),"plugins");
         plugins.put(plugin.getDescription().getName(),plugin);
         plugin.onEnable();
+    }
+
+    @Override
+    public void handleDisable(GuestPluginExecutor executor) {
+        //Unused
     }
 }

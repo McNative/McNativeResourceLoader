@@ -50,7 +50,7 @@
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
         <dependency.bukkit>1.14.2-R0.1-SNAPSHOT</dependency.bukkit>
 
-        <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
+        <dependency.pretronic.libraries>1.2.83.223-SNAPSHOT</dependency.pretronic.libraries>
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
 
 

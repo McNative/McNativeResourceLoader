@@ -1,4 +1,4 @@
-package org.mcnative.loader.loaders.template.bungeecord;
+package org.mcnative.loader.loaders.injector.bungeecord;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.loaders.GuestPluginLoader;

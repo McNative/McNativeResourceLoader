@@ -19,16 +19,17 @@
 
 package org.mcnative.loader;
 
+import net.pretronic.libraries.resourceloader.ResourceException;
 import net.pretronic.libraries.resourceloader.ResourceInfo;
 import net.pretronic.libraries.resourceloader.ResourceLoader;
 import net.pretronic.libraries.resourceloader.VersionInfo;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.ResourceConfig;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,6 +49,7 @@ public class McNativeLoader extends ResourceLoader {
 
     private final Logger logger;
     private final String platform;
+    private final ClassLoaderInjector injector;
     private final LoaderConfiguration configuration;
     private final Map<String,String> variables;
 
@@ -56,10 +58,11 @@ public class McNativeLoader extends ResourceLoader {
         PLATFORM_IDS.put("bungeecord","22ce19f7-9ae8-45ef-9c09-659fc4c9a841");
     }
 
-    public McNativeLoader(Logger logger, String platform, LoaderConfiguration configuration,Map<String,String> variables) {
+    public McNativeLoader(Logger logger, String platform, ClassLoaderInjector injector, LoaderConfiguration configuration, Map<String,String> variables) {
         super(MCNATIVE);
         this.logger = logger;
         this.platform = platform;
+        this.injector = injector;
         this.configuration = configuration;
         this.variables = variables;
 
@@ -155,9 +158,12 @@ public class McNativeLoader extends ResourceLoader {
     }
 
     public boolean launch(){
+        VersionInfo version = this.getCurrentVersion();
+        if(version == null) throw new ResourceException("No installed version found");
         try{
-            loadReflected((URLClassLoader) getClass().getClassLoader());
-            Class<?> mcNativeClass = getClass().getClassLoader().loadClass("org.mcnative.runtime."+this.platform.toLowerCase()+".McNativeLauncher");
+            File location = getLocalFile(version);
+            ClassLoader loader = injector.loadMcNativeClasses(location);
+            Class<?> mcNativeClass = loader.loadClass("org.mcnative.runtime."+this.platform.toLowerCase()+".McNativeLauncher");
             Method launchMethod = mcNativeClass.getMethod("launchMcNative",Map.class);
             launchMethod.invoke(null,this.variables);
             return true;
@@ -167,11 +173,11 @@ public class McNativeLoader extends ResourceLoader {
         return false;
     }
 
-    public static boolean install(Logger logger, String platform, LoaderConfiguration configuration){
-        return install(logger,platform,configuration,new HashMap<>());
+    public static boolean install(Logger logger, String platform, ClassLoaderInjector injector, LoaderConfiguration configuration){
+        return install(logger,platform,injector,configuration,new HashMap<>());
     }
 
-    public static boolean install(Logger logger, String platform, LoaderConfiguration configuration,Map<String,String> variables){
-        return new McNativeLoader(logger,platform,configuration,variables).install();
+    public static boolean install(Logger logger, String platform, ClassLoaderInjector injector, LoaderConfiguration configuration, Map<String,String> variables){
+        return new McNativeLoader(logger,platform,injector,configuration,variables).install();
     }
 }

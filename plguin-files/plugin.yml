@@ -1,0 +1,18 @@
+name: 'DKBans'
+id: 'ea6d0f4d-1a8f-4f9b-835a-c17b9169df17'
+installMcNative: true
+messageModule: 'dkbans'
+description: 'DKBans provides your staff team a powerful tool for punishing and managing players on your network.'
+website: 'https://pretronic.net/'
+author: 'Pretronic'
+depends: []
+softdepend:
+  - 'CloudNet-Bridge'
+  - 'McNative'
+  - 'ViaVersion'
+  - 'CloudNetAPI'
+  - 'Vault'
+  - 'PlaceholderAPI'
+  - 'ProtocolLib'
+main: 'org.mcnative.loader.bootstrap.standalone.BukkitMcNativePluginBootstrap'
+version: 'McNative loader (1.7.75.71)'

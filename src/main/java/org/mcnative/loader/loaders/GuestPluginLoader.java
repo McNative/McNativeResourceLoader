@@ -4,6 +4,8 @@ public interface GuestPluginLoader {
 
     Object getInstance();
 
+    ClassLoader getClassLoader();
+
     default boolean isInstanceAvailable(){
         return getInstance() != null;
     }

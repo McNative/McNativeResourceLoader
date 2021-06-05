@@ -33,6 +33,11 @@ public class BukkitGuestPluginLoader implements GuestPluginLoader {
     }
 
     @Override
+    public ClassLoader getClassLoader() {
+        return plugin.getClass().getClassLoader();
+    }
+
+    @Override
     public String getLoadedVersion() {
         return plugin.getDescription().getVersion();
     }

@@ -1,8 +1,8 @@
-package org.mcnative.loader.loaders.template.bukkit;
+package org.mcnative.loader.loaders.injector.bukkit;
 
-import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -12,21 +12,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitSharedUrlClassLoader extends URLClassLoader {
 
+    private final File file;
     private final JavaPluginLoader loader;
-    private final Method getClassByName;
     private final Method addClassToCache;
 
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
-    public BukkitSharedUrlClassLoader(URL[] urls, ClassLoader parent, JavaPluginLoader loader) {
+    public BukkitSharedUrlClassLoader(File file,URL[] urls, ClassLoader parent, JavaPluginLoader loader) {
         super(urls, parent);
+        this.file = file;
         this.loader = loader;
 
-        this.getClassByName = ReflectionUtil.getMethod(loader.getClass(),"getClassByName",new Class[]{String.class});
-        this.addClassToCache = ReflectionUtil.getMethod(loader.getClass(),"setClass",new Class[]{String.class,Class.class});
+        try {
+            Method getClassByName = loader.getClass().getDeclaredMethod("getClassByName", String.class);
+            this.addClassToCache = loader.getClass().getDeclaredMethod("setClass",String.class,Class.class);
 
-        this.getClassByName.setAccessible(true);
-        this.addClassToCache.setAccessible(true);
+            getClassByName.setAccessible(true);
+            this.addClassToCache.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        BukkitMiddlewareClassMap.getInstance(loader).addLoader(this);
+    }
+
+    public File getFile() {
+        return file;
     }
 
     @Override
@@ -46,11 +56,7 @@ public class BukkitSharedUrlClassLoader extends URLClassLoader {
     }
 
     private Class<?> getClassByName(String name){
-        try {
-            return (Class<?>) getClassByName.invoke(loader,name);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return BukkitMiddlewareClassMap.getInstance(null).getOriginal().get(name);
     }
 
     private void addClassToCache(String name,Class<?> clazz){

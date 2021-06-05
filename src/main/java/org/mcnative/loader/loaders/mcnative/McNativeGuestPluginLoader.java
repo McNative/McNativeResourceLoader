@@ -45,6 +45,11 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
     }
 
     @Override
+    public ClassLoader getClassLoader() {
+        return loader.getClassLoader().asJVMLoader();
+    }
+
+    @Override
     public String getLoadedVersion() {
         return loader.getDescription().getVersion().getName();
     }
@@ -67,6 +72,7 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
         Plugin<?> owner = loader.getInstance();
         loader.shutdownInternal();
         McNative instance = McNative.getInstance();
+        if(instance == null) return;
         instance.getRegistry().unregisterService(owner);
         instance.getScheduler().unregister(owner);
         instance.getLocal().getEventBus().unsubscribe(owner);
@@ -83,7 +89,7 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
         try{
             DependencyGroup dependencies = McNative.getInstance().getDependencyManager().load(data);
             dependencies.install();
-            dependencies.loadReflected((URLClassLoader) loader.getClassLoader().asJVMLoader());
+            dependencies.load();
         }catch (Exception exception){
             logger.log(Level.SEVERE,String.format("Could not install dependencies %s",exception.getMessage()));
             throw new RuntimeException(exception);

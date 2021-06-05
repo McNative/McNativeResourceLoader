@@ -2,10 +2,11 @@ package org.mcnative.loader.bootstrap.template;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
-import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
+import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.Template;
-import org.mcnative.loader.loaders.template.bungeecord.BungeeCordTemplateInjector;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
+import org.mcnative.loader.loaders.injector.bungeecord.BungeeCordClassLoaderInjector;
 import org.mcnative.loader.utils.PrefixLogger;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.logging.Level;
 
 public class BungeeCordTemplateLoaderBootstrap extends Plugin implements PlatformExecutor {
 
-    private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File LOADER_YML = new File("plugins/McNative/loader.yml_");
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
@@ -40,7 +41,9 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
                 return;
             }
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, config,template.getVariables())){
+            ClassLoaderInjector injector = new BungeeCordClassLoaderInjector();
+
+            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD,injector, config,template.getVariables())){
                 getProxy().getPluginManager().unregisterCommands(this);
                 getProxy().getPluginManager().unregisterListeners(this);
                 return;
@@ -50,12 +53,12 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
                 Properties properties = new Properties();
                 properties.setProperty("plugin.name",resource.getKey());
                 properties.setProperty("plugin.id",resource.getValue());
-                GuestPluginExecutor executor = new GuestPluginExecutor(this,getFile()
+                GuestPluginExecutor executor = new GuestPluginExecutor(this,injector,getFile()
                         ,new PrefixLogger(getLogger(),resource.getKey())
                         ,EnvironmentNames.BUNGEECORD,properties,config);
                 this.executors.add(executor);
                 try {
-                    executor.installMultiple(new BungeeCordTemplateInjector());
+                    executor.installMultiple();
                 }catch (Exception e){
                     getLogger().log(Level.SEVERE,"Could not install plugin "+resource.getKey());
                     e.printStackTrace();

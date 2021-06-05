@@ -18,7 +18,7 @@
  * under the License.
  */
 
-package org.mcnative.loader.loaders.template.bukkit;
+package org.mcnative.loader.loaders.injector.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -47,7 +47,7 @@ public class BukkitDummyPlugin implements Plugin {
     private boolean enabled;
     public String name;
 
-    protected BukkitDummyPlugin(GuestPluginLoader loader,String name,String version) {
+    public BukkitDummyPlugin(GuestPluginLoader loader, String name, String version) {
         this.pluginLoader = new DummyClassLoader();
         this.description = new PluginDescriptionFile(name,version,getClass().getName());
         this.name = name;

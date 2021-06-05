@@ -23,6 +23,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
+import org.mcnative.loader.loaders.injector.bungeecord.BungeeCordClassLoaderInjector;
 import org.mcnative.loader.utils.LoaderUtil;
 
 import java.io.File;
@@ -32,7 +34,7 @@ import java.util.logging.Level;
 
 public class BungeeCordMcNativePluginBootstrap extends Plugin implements PlatformExecutor {
 
-    private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File LOADER_YML = new File("plugins/McNative/loader.yml_");
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
@@ -47,7 +49,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             CertificateValidation.disable();
             CredentialsConfig.load(CONFIG_YML);
 
-            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
+            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("plguin-files/mcnative-loader.properties");
             Properties loaderProperties = new Properties();
             loaderProperties.load(loaderConfig);
             if(loaderConfig == null){
@@ -60,8 +62,10 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             LoaderConfiguration configuration = LoaderConfiguration.load(LOADER_YML);
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
+            ClassLoaderInjector injector = new BungeeCordClassLoaderInjector();
+
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
-                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, configuration)){
+                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD,injector, configuration)){
                     getProxy().getPluginManager().unregisterCommands(this);
                     getProxy().getPluginManager().unregisterListeners(this);
                     return;
@@ -70,8 +74,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
 
             configuration.save(LOADER_YML);
 
-            if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD, configuration)) return;
-            this.executor = new GuestPluginExecutor(this,getDescription().getFile(),getLogger(),EnvironmentNames.BUNGEECORD,loaderProperties,configuration);
+            this.executor = new GuestPluginExecutor(this,injector,getDescription().getFile(),getLogger(),EnvironmentNames.BUNGEECORD,loaderProperties,configuration);
 
             if(!this.executor.install()){
                 this.executor = null;

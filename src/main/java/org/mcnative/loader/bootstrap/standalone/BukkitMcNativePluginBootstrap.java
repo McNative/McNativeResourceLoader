@@ -28,13 +28,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
+import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.LoaderUtil;
+import org.mcnative.loader.loaders.injector.bukkit.BukkitClassLoaderInjector;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.URLClassLoader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,7 +43,7 @@ import java.util.logging.Level;
 
 public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listener, PlatformExecutor {
 
-    private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
+    private static final File LOADER_YML = new File("plugins/McNative/loader.yml_");
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 
@@ -57,7 +58,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             CertificateValidation.disable();
             CredentialsConfig.load(CONFIG_YML);
 
-            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
+            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("plguin-files/mcnative-loader.properties");
             Properties loaderProperties = new Properties();
             loaderProperties.load(loaderConfig);
             if(loaderConfig == null){
@@ -69,8 +70,10 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             LoaderConfiguration configuration = LoaderConfiguration.load(LOADER_YML);
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
+            ClassLoaderInjector injector = new BukkitClassLoaderInjector();
+
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
-                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT, configuration)){
+                if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT,injector, configuration)){
                     getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -78,7 +81,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
 
             configuration.save(LOADER_YML);
 
-            this.executor = new GuestPluginExecutor(this,getFile(),getLogger(),EnvironmentNames.BUKKIT,loaderProperties,configuration);
+            this.executor = new GuestPluginExecutor(this,injector,getFile(),getLogger(),EnvironmentNames.BUKKIT,loaderProperties,configuration);
 
             if(!this.executor.install()){
                 this.executor = null;

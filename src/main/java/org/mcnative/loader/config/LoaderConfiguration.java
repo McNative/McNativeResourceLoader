@@ -212,7 +212,7 @@ public class LoaderConfiguration {
     }
 
     public static LoaderConfiguration load(File location) throws Exception{
-        InputStream stream = LoaderConfiguration.class.getClassLoader().getResourceAsStream("loader.yml");
+        InputStream stream = LoaderConfiguration.class.getClassLoader().getResourceAsStream("loader.yml_");
         if(stream == null && location.exists()) stream = new FileInputStream(location);
 
         if(stream != null) return YAML.loadAs(stream,LoaderConfiguration.class);

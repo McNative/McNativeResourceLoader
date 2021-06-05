@@ -38,7 +38,7 @@ public class CredentialsConfig {
     }
 
     public static void load(File location){
-        InputStream stream = CredentialsConfig.class.getClassLoader().getResourceAsStream("credentials.properties");
+        InputStream stream = CredentialsConfig.class.getClassLoader().getResourceAsStream("credentials.properties_");
         if(stream != null){
             Properties properties = new Properties();
             try {
