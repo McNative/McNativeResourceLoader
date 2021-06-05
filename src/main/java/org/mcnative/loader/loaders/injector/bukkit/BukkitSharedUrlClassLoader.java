@@ -24,15 +24,12 @@ public class BukkitSharedUrlClassLoader extends URLClassLoader {
         this.loader = loader;
 
         try {
-            Method getClassByName = loader.getClass().getDeclaredMethod("getClassByName", String.class);
             this.addClassToCache = loader.getClass().getDeclaredMethod("setClass",String.class,Class.class);
-
-            getClassByName.setAccessible(true);
             this.addClassToCache.setAccessible(true);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        BukkitMiddlewareClassMap.getInstance(loader).addLoader(this);
+        BukkitMiddlewareClassMap.getInstance().addLoader(this);
     }
 
     public File getFile() {
@@ -56,7 +53,7 @@ public class BukkitSharedUrlClassLoader extends URLClassLoader {
     }
 
     private Class<?> getClassByName(String name){
-        return BukkitMiddlewareClassMap.getInstance(null).getOriginal().get(name);
+        return BukkitMiddlewareClassMap.getInstance().getOriginal().get(name);
     }
 
     private void addClassToCache(String name,Class<?> clazz){

@@ -9,9 +9,10 @@ public class PrefixLogger extends Logger {
     private final String name;
 
     public PrefixLogger(Logger logger,String name) {
-        super(PrefixLogger.class.getCanonicalName(), null);
+        super("MCL", null);
         setParent(logger);
         setLevel(Level.ALL);
+
         this.name = "[" + name + "] ";
     }
 

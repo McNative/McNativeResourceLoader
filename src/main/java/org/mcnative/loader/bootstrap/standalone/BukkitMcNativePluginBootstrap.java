@@ -43,7 +43,7 @@ import java.util.logging.Level;
 
 public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listener, PlatformExecutor {
 
-    private static final File LOADER_YML = new File("plugins/McNative/loader.yml_");
+    private static final File LOADER_YML = new File("plugins/McNative/loader.yml");
     private static final File CONFIG_YML = new File("plugins/McNative/config.yml");
     private static final File LOADER_CACHE = new File("plugins/McNative/lib/rollout.dat");
 

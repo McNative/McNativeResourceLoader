@@ -56,7 +56,7 @@ public class BukkitClassLoaderInjector implements ClassLoaderInjector {
     public void handleDisable(GuestPluginExecutor executor) {
         ClassLoader loader = executor.getLoader().getClassLoader();
         if(loader instanceof BukkitSharedUrlClassLoader){
-            BukkitMiddlewareClassMap.getInstance(null).removeLoader((BukkitSharedUrlClassLoader) loader);
+            BukkitMiddlewareClassMap.getInstance().removeLoader((BukkitSharedUrlClassLoader) loader);
         }
     }
 }

@@ -56,9 +56,10 @@ public class McNativeGuestPluginLoader implements GuestPluginLoader {
 
     @Override
     public void handlePluginLoad() {
-        McNative.getInstance().getPluginManager().provideLoader(loader);
         loader.construct();
         loader.initialize();
+        McNative.getInstance().getPluginManager().provideLoader(loader);
+
         loader.load();
     }
 

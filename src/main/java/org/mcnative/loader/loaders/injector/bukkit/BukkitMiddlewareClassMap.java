@@ -1,6 +1,7 @@
 package org.mcnative.loader.loaders.injector.bukkit;
 
 import org.bukkit.plugin.java.JavaPluginLoader;
+import org.mcnative.loader.GuestPluginExecutor;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -100,21 +101,13 @@ public class BukkitMiddlewareClassMap implements Map<String, Class<?>> {
         return original.entrySet();
     }
 
-    public static BukkitMiddlewareClassMap getInstance(JavaPluginLoader loader) {
-        if(INSTANCE == null) INSTANCE = inject(loader);
+    public static BukkitMiddlewareClassMap getInstance() {
+        if(INSTANCE == null) INSTANCE = inject(GuestPluginExecutor.class.getClassLoader());
         return INSTANCE;
     }
 
-    /*
-    public void reset(){
-        JavaPluginLoader loader = (JavaPluginLoader) ReflectionUtil.getFieldValue(McNativeLoader.class.getClassLoader(),"loader");
-        Field field = ReflectionUtil.getField(loader.getClass(),"classes");
-        field.setAccessible(true);
-        ReflectionUtil.setUnsafeObjectFieldValue(loader,field,original);
-    }
-     */
-
-    public static BukkitMiddlewareClassMap inject(JavaPluginLoader loader){
+    @SuppressWarnings("unchecked")
+    public static BukkitMiddlewareClassMap inject(ClassLoader loader){
         try {
             Field field = loader.getClass().getDeclaredField("classes");
             field.setAccessible(true);
