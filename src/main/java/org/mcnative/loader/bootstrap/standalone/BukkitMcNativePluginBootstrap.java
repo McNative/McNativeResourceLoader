@@ -58,7 +58,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             CertificateValidation.disable();
             CredentialsConfig.load(CONFIG_YML);
 
-            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("plguin-files/mcnative-loader.properties");
+            InputStream loaderConfig = getClass().getClassLoader().getResourceAsStream("mcnative-loader.properties");
             Properties loaderProperties = new Properties();
             loaderProperties.load(loaderConfig);
             if(loaderConfig == null){
