@@ -29,6 +29,7 @@ import org.mcnative.loader.*;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
+import org.mcnative.loader.loaders.injector.bukkit.BukkitInjectorGetter;
 import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.LoaderUtil;
 import org.mcnative.loader.loaders.injector.bukkit.BukkitClassLoaderInjector;
@@ -70,7 +71,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             LoaderConfiguration configuration = LoaderConfiguration.load(LOADER_YML);
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
-            ClassLoaderInjector injector = new BukkitClassLoaderInjector();
+            ClassLoaderInjector injector = BukkitInjectorGetter.get(getLogger());
 
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
                 if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT,injector, configuration)){

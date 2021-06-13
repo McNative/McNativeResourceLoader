@@ -7,6 +7,7 @@ import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.Template;
 import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.loaders.injector.bukkit.BukkitClassLoaderInjector;
+import org.mcnative.loader.loaders.injector.bukkit.BukkitInjectorGetter;
 import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.PrefixLogger;
 
@@ -37,7 +38,7 @@ public class BukkitTemplateLoaderBootstrap extends JavaPlugin implements Platfor
 
             Template template = Template.pullTemplate(getLogger(),config);
 
-            ClassLoaderInjector injector = new BukkitClassLoaderInjector();
+            ClassLoaderInjector injector = BukkitInjectorGetter.get(getLogger());
 
             if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT,injector, config,template.getVariables())){
                 getServer().getPluginManager().disablePlugin(this);
