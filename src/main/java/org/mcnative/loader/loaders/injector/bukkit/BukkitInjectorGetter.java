@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 public class BukkitInjectorGetter {
 
     public static ClassLoaderInjector get(Logger logger){
+        return new BukkitClassLoaderInjector();
+        /*
         if(getJavaBaseVersion() < 16){
             return new BukkitLegacyClassLoaderInjector();
         }else{
@@ -19,6 +21,7 @@ public class BukkitInjectorGetter {
             }
             return new BukkitClassLoaderInjector();
         }
+         */
     }
 
     private static boolean isOldVersion(){

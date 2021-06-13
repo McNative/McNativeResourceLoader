@@ -32,7 +32,6 @@ import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.loaders.injector.bukkit.BukkitInjectorGetter;
 import org.mcnative.loader.utils.BukkitUtil;
 import org.mcnative.loader.utils.LoaderUtil;
-import org.mcnative.loader.loaders.injector.bukkit.BukkitClassLoaderInjector;
 
 import java.io.File;
 import java.io.InputStream;
