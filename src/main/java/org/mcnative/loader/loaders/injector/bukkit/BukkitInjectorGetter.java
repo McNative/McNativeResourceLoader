@@ -9,10 +9,9 @@ import java.util.logging.Logger;
 public class BukkitInjectorGetter {
 
     public static ClassLoaderInjector get(Logger logger){
-        return new BukkitClassLoaderInjector();
-        /*
         if(getJavaBaseVersion() < 16){
-            return new BukkitLegacyClassLoaderInjector();
+            if(isMinecraft16())  return new BukkitLegacyClassLoaderInjector();
+            return new BukkitClassLoaderInjector();
         }else{
             if(isOldVersion()){
                 logger.log(Level.WARNING,"[McNative] ------------------------");
@@ -21,7 +20,6 @@ public class BukkitInjectorGetter {
             }
             return new BukkitClassLoaderInjector();
         }
-         */
     }
 
     private static boolean isOldVersion(){
@@ -31,6 +29,10 @@ public class BukkitInjectorGetter {
         } catch (ClassNotFoundException e) {
             return true;
         }
+    }
+
+    private static boolean isMinecraft16(){
+        return getVersion().toLowerCase().contains("1_16");
     }
 
     private static String getVersion() {
