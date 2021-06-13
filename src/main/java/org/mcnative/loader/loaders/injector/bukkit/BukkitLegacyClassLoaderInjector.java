@@ -42,7 +42,7 @@ public class BukkitLegacyClassLoaderInjector implements ClassLoaderInjector {
             METHOD_ADD_URL.invoke(loader, location.toURI().toURL());
             return loader;
         } catch (IllegalAccessException | InvocationTargetException | MalformedURLException exception) {
-            throw new ReflectException(exception);
+            throw new RuntimeException(exception);
         }
     }
 
