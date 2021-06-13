@@ -1,9 +1,7 @@
 package org.mcnative.loader.loaders.injector.bukkit;
 
-import net.pretronic.libraries.utility.reflect.ReflectException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.GuestPluginExecutor;
 import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 
