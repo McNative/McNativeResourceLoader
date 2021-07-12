@@ -245,15 +245,18 @@ public class GuestPluginExecutor {
     }
 
     public void loadGuestPlugin(){
+        if(loader == null) return;
         if(this.mcnative && injector != null) injector.handleEnable(this);
         loader.handlePluginLoad();
     }
 
     public void enableGuestPlugin(){
+        if(loader == null) return;
         loader.handlePluginEnable();
     }
 
     public void disableGuestPlugin(){
+        if(loader == null) return;
         injector.handleDisable(this);
         loader.handlePluginDisable();
     }

@@ -10,7 +10,10 @@ public class BukkitInjectorGetter {
 
     public static ClassLoaderInjector get(Logger logger){
         if(getJavaBaseVersion() < 16){
-            if(isMinecraft16())  return new BukkitLegacyClassLoaderInjector();
+            if(isMinecraft16()) {
+                logger.log(Level.WARNING,"[McNative] Using legacy class loader injector because of 1.16 compatibility issues");
+                return new BukkitLegacyClassLoaderInjector();
+            }
             return new BukkitClassLoaderInjector();
         }else{
             if(isOldVersion()){
