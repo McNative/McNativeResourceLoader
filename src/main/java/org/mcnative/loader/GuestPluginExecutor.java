@@ -176,7 +176,7 @@ public class GuestPluginExecutor {
         }
 
         if(config.isAutomatically()){
-            if(latest != null){
+            if(latest != null && !latest.equals(VersionInfo.UNKNOWN)){
                 if(current != null && resourceLoader.isLatestVersion()){
                     logger.info("(Resource-Loader) McNative "+latest.getName()+" (Up to date)");
                 }else{
