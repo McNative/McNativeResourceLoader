@@ -137,7 +137,8 @@ public class BukkitDummyPlugin implements Plugin {
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String s, String s1) {
-        throw new UnsupportedOperationException("McNative dummy plugin is not able to provide a world generator");
+        //throw new UnsupportedOperationException("McNative dummy plugin is not able to provide a world generator");
+        return null;
     }
 
     @Override
