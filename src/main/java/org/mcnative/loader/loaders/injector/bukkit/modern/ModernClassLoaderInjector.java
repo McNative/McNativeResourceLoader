@@ -20,6 +20,15 @@ import java.util.Map;
 public class ModernClassLoaderInjector implements ClassLoaderInjector {
 
     @Override
+    public void prepare() {
+        try {
+            LibraryClassLoaderGroup.injectLoader(getClass().getClassLoader(),null);
+        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public ClassLoader loadMcNativeClasses(File location) {
         return getClassLoader(null,location);
     }

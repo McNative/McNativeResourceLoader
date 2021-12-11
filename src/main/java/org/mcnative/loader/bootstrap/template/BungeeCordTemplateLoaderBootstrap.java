@@ -42,6 +42,7 @@ public class BungeeCordTemplateLoaderBootstrap extends Plugin implements Platfor
             }
 
             ClassLoaderInjector injector = new BungeeCordClassLoaderInjector();
+            injector.prepare();
 
             if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD,injector, config,template.getVariables())){
                 getProxy().getPluginManager().unregisterCommands(this);

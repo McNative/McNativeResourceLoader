@@ -63,6 +63,7 @@ public class BungeeCordMcNativePluginBootstrap extends Plugin implements Platfor
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
             ClassLoaderInjector injector = new BungeeCordClassLoaderInjector();
+            injector.prepare();
 
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
                 if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUNGEECORD,injector, configuration)){

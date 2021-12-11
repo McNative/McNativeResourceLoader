@@ -71,6 +71,7 @@ public class BukkitMcNativePluginBootstrap extends JavaPlugin implements Listene
             configuration.pullProfiles(getLogger(),LOADER_CACHE);
 
             ClassLoaderInjector injector = BukkitInjectorGetter.get(getLogger());
+            injector.prepare();
 
             if(loaderProperties.getProperty("installMcNative").equalsIgnoreCase("true")){
                 if(!McNativeLoader.install(getLogger(), EnvironmentNames.BUKKIT,injector, configuration)){

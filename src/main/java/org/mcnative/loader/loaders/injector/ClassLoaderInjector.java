@@ -6,6 +6,10 @@ import java.io.File;
 
 public interface ClassLoaderInjector {
 
+    default void prepare(){
+        //unused
+    }
+
     ClassLoader loadMcNativeClasses(File location);
 
     ClassLoader getClassLoader(GuestPluginExecutor executor,File location);

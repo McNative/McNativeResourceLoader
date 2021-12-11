@@ -7,10 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LibraryClassLoaderGroup extends URLClassLoader {
@@ -29,10 +26,12 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
+        System.out.println(" => SEARCHING CLASS IN GROUP LOADER ("+System.identityHashCode(this)+") "+name);
         Class<?> result = classes.get(name);
 
         if (result == null) {
             for (Map.Entry<ClassLoader, Method> loader : loaders.entrySet()) {
+                System.out.println(" - in "+loader.getKey().getClass());
                 result = loader.getKey().loadClass(name);
                 if(result != null){
                     classes.put(name, result);
@@ -40,7 +39,10 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
                 }
             }
             throw new ClassNotFoundException();
+        }else{
+            System.out.println(" - cached");
         }
+        System.out.println("----");
         return result;
     }
 
@@ -63,6 +65,7 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
     }
 
     public void addLoader(ClassLoader loader) throws NoSuchMethodException {
+        System.out.println("REGISTERED IN GROUP LOADER ("+System.identityHashCode(this)+") "+loader.getClass());
         this.loaders.put(loader,loader.getClass().getDeclaredMethod("loadClassDirect",String.class));
     }
 
@@ -90,6 +93,8 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
             group = new LibraryClassLoaderGroup();
             field.set(loader,group);
         }
+
+        if(toAdd == null) return;
 
         toAdd.setGroupLoader(group);
 

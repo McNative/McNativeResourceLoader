@@ -15,7 +15,6 @@ import org.mcnative.runtime.api.McNative;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URLClassLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
