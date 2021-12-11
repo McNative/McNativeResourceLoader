@@ -1,6 +1,5 @@
 package org.mcnative.loader.loaders.injector.bukkit;
 
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.GuestPluginExecutor;
 import sun.misc.Unsafe;
 

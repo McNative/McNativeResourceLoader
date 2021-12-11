@@ -23,12 +23,16 @@ import net.pretronic.libraries.resourceloader.ResourceException;
 import net.pretronic.libraries.resourceloader.ResourceInfo;
 import net.pretronic.libraries.resourceloader.ResourceLoader;
 import net.pretronic.libraries.resourceloader.VersionInfo;
+import net.pretronic.libraries.utility.io.FileUtil;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.config.LoaderConfiguration;
 import org.mcnative.loader.config.CredentialsConfig;
 import org.mcnative.loader.config.ResourceConfig;
 import org.mcnative.loader.loaders.BukkitGuestPluginLoader;
 import org.mcnative.loader.loaders.BungeeCordGuestPluginLoader;
 import org.mcnative.loader.loaders.GuestPluginLoader;
+import org.mcnative.loader.loaders.injector.bukkit.modern.BukkitModernUrlClassLoader;
+import org.mcnative.loader.loaders.injector.bukkit.modern.LibraryClassLoaderGroup;
 import org.mcnative.loader.loaders.mcnative.McNativeGuestPluginLoader;
 import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
 import org.mcnative.loader.utils.LoaderUtil;
@@ -36,6 +40,10 @@ import org.mcnative.loader.utils.LoaderUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Properties;
@@ -148,14 +156,14 @@ public class GuestPluginExecutor {
             info.setAuthenticator(httpURLConnection -> {
                 httpURLConnection.setRequestProperty("networkId", CredentialsConfig.getNetworkId());
                 httpURLConnection.setRequestProperty("networkSecret", CredentialsConfig.getNetworkSecret());
-                httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");//Work around
+                httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");
             });
         }else{
             String licenseKey = getLicenseKey(name);
             if(licenseKey != null){
                 info.setAuthenticator(httpURLConnection -> {
                     httpURLConnection.setRequestProperty("licenseKey", licenseKey);
-                    httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");//Work around
+                    httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");
                 });
             }
         }

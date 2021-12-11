@@ -10,6 +10,12 @@ import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*
+
+loadClass
+    check class cache
+
+ */
 public class BukkitSharedUrlClassLoader extends URLClassLoader {
 
     private final File file;

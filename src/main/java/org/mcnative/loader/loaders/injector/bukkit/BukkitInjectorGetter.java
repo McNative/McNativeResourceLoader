@@ -1,8 +1,11 @@
 package org.mcnative.loader.loaders.injector.bukkit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import org.mcnative.loader.loaders.injector.ClassLoaderInjector;
+import org.mcnative.loader.loaders.injector.bukkit.modern.ModernClassLoaderInjector;
 
+import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +24,17 @@ public class BukkitInjectorGetter {
                 logger.log(Level.WARNING,"[McNative] Versions above Java 15 are not officially supported for "+ getVersion()+", it might cause issues on your server");
                 logger.log(Level.WARNING,"[McNative] ------------------------");
             }
+
+            try {
+                Field field = BukkitInjectorGetter.class.getClassLoader().getClass().getDeclaredField("loader");
+                field.setAccessible(true);
+                JavaPluginLoader  loader = (JavaPluginLoader) field.get(BukkitInjectorGetter.class.getClassLoader());
+                Field hasField = loader.getClass().getDeclaredField("classes");
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                logger.log(Level.INFO,"[McNative] Using modern class loader implementation");
+                return new ModernClassLoaderInjector();
+            }
+            logger.log(Level.INFO,"[McNative] Using standard class loader implementation");
             return new BukkitClassLoaderInjector();
         }
     }

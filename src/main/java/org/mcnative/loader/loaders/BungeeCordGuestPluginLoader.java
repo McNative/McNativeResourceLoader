@@ -72,8 +72,8 @@ public class BungeeCordGuestPluginLoader implements GuestPluginLoader {
     private PluginDescription loadPluginDescription(File file){
         if ( file.isFile() && file.getName().endsWith( ".jar" ) ) {
             try ( JarFile jar = new JarFile( file ) ) {
-                JarEntry pdf = jar.getJarEntry("bungee.yml");
-                if (pdf == null ) pdf = jar.getJarEntry("plugin.yml");
+                JarEntry pdf = jar.getJarEntry("template/bungee.yml");
+                if (pdf == null ) pdf = jar.getJarEntry("template/plugin.yml");
                 if(pdf == null) throw new IllegalArgumentException("Plugin must have a plugin.yml or bungee.yml");
 
 

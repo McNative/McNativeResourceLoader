@@ -88,7 +88,7 @@ public class McNativePluginLoader extends DefaultPluginLoader {
 
     @Override
     public PluginDescription loadDescription() {
-        InputStream stream = getClassLoader().getResourceAsStream("mcnative.json");
+        InputStream stream = getClassLoader().asJVMLoader().getResourceAsStream("mcnative.json");
         if(stream == null) throw new IllegalArgumentException("No mcnative.json available");
         PluginDescription result = DefaultPluginDescription.create(getPluginManager(), DocumentFileType.JSON.getReader().read(stream));
         try { stream.close(); } catch (IOException ignored) {}
