@@ -1,0 +1,14 @@
+name: 'McNative-Template-Loader'
+website: 'https://mcnative.org'
+author: 'Pretronic'
+depends: []
+softDepends:
+  - 'CloudNet-Bridge'
+  - 'McNative'
+  - 'ViaVersion'
+  - 'CloudNetAPI'
+  - 'Vault'
+  - 'PlaceholderAPI'
+  - 'ProtocolLib'
+main: 'org.mcnative.loader.bootstrap.template.BungeeCordTemplateLoaderBootstrap'
+version: '${project.version}'

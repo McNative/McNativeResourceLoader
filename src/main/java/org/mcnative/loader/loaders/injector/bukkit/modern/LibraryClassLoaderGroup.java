@@ -10,11 +10,12 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LibraryClassLoaderGroup extends URLClassLoader {
 
-    private final Collection<BukkitModernUrlClassLoader> loaders = ConcurrentHashMap.newKeySet();
+    private final Map<ClassLoader,Method> loaders = new ConcurrentHashMap<>();
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
     public LibraryClassLoaderGroup() {
@@ -31,8 +32,8 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
         Class<?> result = classes.get(name);
 
         if (result == null) {
-            for (ClassLoader loader : loaders) {
-                result = loader.loadClass(name);
+            for (Map.Entry<ClassLoader, Method> loader : loaders.entrySet()) {
+                result = loader.getKey().loadClass(name);
                 if(result != null){
                     classes.put(name, result);
                     return result;
@@ -43,13 +44,13 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
         return result;
     }
 
-    public Class<?> findClassIgnored(String name, ClassLoader ignore) throws ClassNotFoundException {
+    public Class<?> findClassIgnored(String name, ClassLoader ignore) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         Class<?> result = classes.get(name);
 
         if (result == null) {
-            for (BukkitModernUrlClassLoader loader : loaders) {
+            for (Map.Entry<ClassLoader, Method> loader : loaders.entrySet()) {
                 if(!loader.equals(ignore)){
-                    result = loader.loadClassDirect(name);
+                    result = (Class<?>) loader.getValue().invoke(loader.getKey(),name);
                     if(result != null){
                         classes.put(name, result);
                         return result;
@@ -61,8 +62,8 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
         return result;
     }
 
-    public void addLoader(BukkitModernUrlClassLoader loader){
-        this.loaders.add(loader);
+    public void addLoader(ClassLoader loader) throws NoSuchMethodException {
+        this.loaders.put(loader,loader.getClass().getDeclaredMethod("loadClassDirect",String.class));
     }
 
     public static void injectLoader(ClassLoader loader, BukkitModernUrlClassLoader toAdd) throws NoSuchFieldException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -92,7 +93,7 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
 
         toAdd.setGroupLoader(group);
 
-        Method method = group.getClass().getDeclaredMethod("addLoader",BukkitModernUrlClassLoader.class);
+        Method method = group.getClass().getDeclaredMethod("addLoader",ClassLoader.class);
         method.setAccessible(true);
         method.invoke(group,toAdd);
     }
