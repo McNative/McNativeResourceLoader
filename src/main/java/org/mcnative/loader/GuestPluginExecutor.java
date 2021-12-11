@@ -246,7 +246,7 @@ public class GuestPluginExecutor {
 
     public void loadGuestPlugin(){
         if(loader == null) return;
-        if(this.mcnative && injector != null) injector.handleEnable(this);
+        if(this.mcnative && this.multiple && injector != null) injector.handleEnable(this);
         loader.handlePluginLoad();
     }
 

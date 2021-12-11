@@ -26,26 +26,20 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        System.out.println(" => SEARCHING CLASS IN GROUP LOADER ("+System.identityHashCode(this)+") "+name);
         Class<?> result = classes.get(name);
 
         if (result == null) {
             for (Map.Entry<ClassLoader, Method> loader : loaders.entrySet()) {
-                System.out.println(" - in "+loader.getKey().getClass());
                 try{
                     result = loader.getKey().loadClass(name);
                 }catch (ClassNotFoundException ignored){}
-                System.out.println(" - result: "+result);
                 if(result != null){
                     classes.put(name, result);
                     return result;
                 }
             }
             throw new ClassNotFoundException();
-        }else{
-            System.out.println(" - cached");
         }
-        System.out.println("----");
         return result;
     }
 
@@ -68,7 +62,6 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
     }
 
     public void addLoader(ClassLoader loader) throws NoSuchMethodException {
-        System.out.println("REGISTERED IN GROUP LOADER ("+System.identityHashCode(this)+") "+loader.getClass());
         this.loaders.put(loader,loader.getClass().getDeclaredMethod("loadClassDirect",String.class));
     }
 
@@ -92,10 +85,8 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
             }
         }
 
-        if(group == null){
-            group = new LibraryClassLoaderGroup();
-            field.set(loader,group);
-        }
+        if(group == null) group = new LibraryClassLoaderGroup();
+        field.set(loader,group);
 
         if(toAdd == null) return;
 
