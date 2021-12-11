@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LibraryClassLoaderGroup extends URLClassLoader {
 
-    private final Map<ClassLoader,Method> loaders = new ConcurrentHashMap<>();
+    private final Map<ClassLoader,Method> loaders = new LinkedHashMap<>();
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
     public LibraryClassLoaderGroup() {
@@ -32,7 +32,10 @@ public class LibraryClassLoaderGroup extends URLClassLoader {
         if (result == null) {
             for (Map.Entry<ClassLoader, Method> loader : loaders.entrySet()) {
                 System.out.println(" - in "+loader.getKey().getClass());
-                result = loader.getKey().loadClass(name);
+                try{
+                    result = loader.getKey().loadClass(name);
+                }catch (ClassNotFoundException ignored){}
+                System.out.println(" - result: "+result);
                 if(result != null){
                     classes.put(name, result);
                     return result;

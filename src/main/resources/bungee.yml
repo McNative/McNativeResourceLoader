@@ -1,5 +1,9 @@
-name: 'McNative-Template-Loader'
-website: 'https://mcnative.org'
+name: 'DKBans'
+id: 'ea6d0f4d-1a8f-4f9b-835a-c17b9169df17'
+installMcNative: true
+messageModule: 'dkbans'
+description: 'DKBans provides your staff team a powerful tool for punishing and managing players on your network.'
+website: 'https://pretronic.net/'
 author: 'Pretronic'
 depends: []
 softDepends:
@@ -10,5 +14,5 @@ softDepends:
   - 'Vault'
   - 'PlaceholderAPI'
   - 'ProtocolLib'
-main: 'org.mcnative.loader.bootstrap.template.BungeeCordTemplateLoaderBootstrap'
-version: '${project.version}'
+main: 'org.mcnative.loader.bootstrap.standalone.BungeeCordMcNativePluginBootstrap'
+version: 'McNative loader (1.7.75.71)'
